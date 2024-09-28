@@ -259,7 +259,8 @@ esp_err_t esp_console_new_repl_uart(const esp_console_dev_uart_config_t *dev_con
     uart_set_pin(dev_config->channel, dev_config->tx_gpio_num, dev_config->rx_gpio_num, -1, -1);
 
     /* Install UART driver for interrupt-driven reads and writes */
-    ret = uart_driver_install(dev_config->channel, 256, 0, 0, NULL, 0);
+    /* CUSTOM@SIKOR set ESP_INTR_FLAG_IRAM in intr_alloc_flags */
+    ret = uart_driver_install(dev_config->channel, 256, 0, 0, NULL, ESP_INTR_FLAG_IRAM);
     if (ret != ESP_OK) {
         goto _exit;
     }
