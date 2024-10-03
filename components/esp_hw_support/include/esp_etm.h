@@ -32,7 +32,7 @@ typedef struct esp_etm_task_t *esp_etm_task_handle_t;
  * @brief ETM channel configuration
  */
 typedef struct {
-
+    uint8_t dummy; /*!< Dummy field */
 } esp_etm_channel_config_t;
 
 /**
