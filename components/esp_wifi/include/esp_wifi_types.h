@@ -448,7 +448,11 @@ typedef struct {
     uint8_t length;          /**< Length of all bytes in the element data following this field. Minimum 4. */
     uint8_t vendor_oui[3];   /**< Vendor identifier (OUI). */
     uint8_t vendor_oui_type; /**< Vendor-specific OUI type. */
+    #if !defined(_MSC_VER) /* #CUSTOM@NDRS */
     uint8_t payload[0];      /**< Payload. Length is equal to value in 'length' field, minus 4. */
+    #else
+    uint8_t payload[1];
+    #endif
 } vendor_ie_data_t;
 
 #if CONFIG_SOC_WIFI_HE_SUPPORT
@@ -511,7 +515,11 @@ typedef struct {
  */
 typedef struct {
     wifi_pkt_rx_ctrl_t rx_ctrl; /**< metadata header */
+    #if !defined(_MSC_VER) /* #CUSTOM@NDRS */
     uint8_t payload[0];       /**< Data or management payload. Length of payload is described by rx_ctrl.sig_len. Type of content determined by packet type argument of callback. */
+    #else
+    uint8_t payload[1];
+    #endif
 } wifi_promiscuous_pkt_t;
 
 /**
@@ -656,7 +664,11 @@ typedef struct {
     bool no_ack;                /**< Indicates no ack required */
     wifi_action_rx_cb_t rx_cb;  /**< Rx Callback to receive any response */
     uint32_t data_len;          /**< Length of the appended Data */
+    #if !defined(_MSC_VER) /* #CUSTOM@NDRS */
     uint8_t data[0];            /**< Appended Data payload */
+    #else
+    uint8_t data[1];
+    #endif
 } wifi_action_tx_req_t;
 
 /**
