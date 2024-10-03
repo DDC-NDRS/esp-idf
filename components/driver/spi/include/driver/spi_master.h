@@ -366,7 +366,11 @@ esp_err_t spi_device_get_actual_freq(spi_device_handle_t handle, int *freq_khz);
  *
  * @return Actual working frequency that most fit.
  */
-int spi_get_actual_clock(int fapb, int hz, int duty_cycle) __attribute__((deprecated("Please use spi_device_get_actual_freq instead")));
+int spi_get_actual_clock(int fapb, int hz, int duty_cycle)
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
+__attribute__((deprecated("Please use spi_device_get_actual_freq instead")))
+#endif
+;
 
 /**
   * @brief Calculate the timing settings of specified frequency and settings.

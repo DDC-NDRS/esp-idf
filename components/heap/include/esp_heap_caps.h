@@ -146,7 +146,11 @@ void *heap_caps_aligned_alloc(size_t alignment, size_t size, uint32_t caps);
  * @param ptr Pointer to the memory allocated
  * @note This function is deprecated, please consider using heap_caps_free() instead
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 void __attribute__((deprecated))  heap_caps_aligned_free(void *ptr);
+#else
+void heap_caps_aligned_free(void* ptr);
+#endif
 
 /**
  * @brief Allocate an aligned chunk of memory which has the given capabilities. The initialized value in the memory is set to zero.

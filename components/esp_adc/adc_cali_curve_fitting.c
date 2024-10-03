@@ -21,7 +21,10 @@
 #include "esp_efuse_rtc_calib.h"
 #include "curve_fitting_coefficients.h"
 
-const __attribute__((unused)) static char *TAG = "adc_cali";
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
+__attribute__((unused))
+#endif
+static char const* TAG = "adc_cali";
 
 // coeff_a is actually a float number
 // it is scaled to put them into uint32_t so that the headers do not have to be changed
@@ -185,11 +188,18 @@ static int32_t get_reading_error(uint64_t v_cali_1, const cali_chars_second_step
         return 0;
     }
 
+    #if defined(__GNUC__) /* #CUSTOM@NDRS */
     uint8_t term_num = param->term_num;
-    int32_t error = 0;
-    uint64_t coeff = 0;
     uint64_t variable[term_num];
     uint64_t term[term_num];
+    #else
+    uint8_t term_num = param->term_num;
+    uint64_t variable[TERM_MAX];
+    uint64_t term[TERM_MAX];
+    #endif
+
+    int32_t error = 0;
+    uint64_t coeff = 0;
     memset(variable, 0, term_num * sizeof(uint64_t));
     memset(term, 0, term_num * sizeof(uint64_t));
 

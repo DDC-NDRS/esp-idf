@@ -194,7 +194,11 @@ esp_err_t esp_vfs_fat_sdspi_mount(const char* base_path,
  *      - ESP_OK on success
  *      - ESP_ERR_INVALID_STATE if esp_vfs_fat_sdmmc_mount hasn't been called
  */
-esp_err_t esp_vfs_fat_sdmmc_unmount(void) __attribute__((deprecated("Please use esp_vfs_fat_sdcard_unmount instead")));
+esp_err_t esp_vfs_fat_sdmmc_unmount(void)
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
+__attribute__((deprecated("Please use esp_vfs_fat_sdcard_unmount instead")))
+#endif
+;
 
 /**
  * @brief Unmount an SD card from the FAT filesystem and release resources acquired using
@@ -345,13 +349,19 @@ esp_err_t esp_vfs_fat_spiflash_mount(const char* base_path,
     const char* partition_label,
     const esp_vfs_fat_mount_config_t* mount_config,
     wl_handle_t* wl_handle)
-    __attribute__((deprecated("esp_vfs_fat_spiflash_mount is deprecated, please use esp_vfs_fat_spiflash_mount_rw_wl instead")));
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
+__attribute__((deprecated("esp_vfs_fat_spiflash_mount is deprecated, please use esp_vfs_fat_spiflash_mount_rw_wl instead")))
+#endif
+;
 
 /**
  * @deprecated Please use `esp_vfs_fat_spiflash_unmount_rw_wl` instead
  */
 esp_err_t esp_vfs_fat_spiflash_unmount(const char* base_path, wl_handle_t wl_handle)
-    __attribute__((deprecated("esp_vfs_fat_spiflash_unmount is deprecated, please use esp_vfs_fat_spiflash_unmount_rw_wl instead")));
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
+__attribute__((deprecated("esp_vfs_fat_spiflash_unmount is deprecated, please use esp_vfs_fat_spiflash_unmount_rw_wl instead")))
+#endif
+;
 
 /**
  * @deprecated Please use `esp_vfs_fat_spiflash_mount_ro` instead
@@ -359,13 +369,19 @@ esp_err_t esp_vfs_fat_spiflash_unmount(const char* base_path, wl_handle_t wl_han
 esp_err_t esp_vfs_fat_rawflash_mount(const char* base_path,
     const char* partition_label,
     const esp_vfs_fat_mount_config_t* mount_config)
-    __attribute__((deprecated("esp_vfs_fat_rawflash_mount is deprecated, please use esp_vfs_fat_spiflash_mount_ro instead")));
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
+__attribute__((deprecated("esp_vfs_fat_rawflash_mount is deprecated, please use esp_vfs_fat_spiflash_mount_ro instead")))
+#endif
+;
 
 /**
  * @deprecated Please use `esp_vfs_fat_spiflash_unmount_ro` instead
  */
 esp_err_t esp_vfs_fat_rawflash_unmount(const char* base_path, const char* partition_label)
-    __attribute__((deprecated("esp_vfs_fat_rawflash_unmount is deprecated, please use esp_vfs_fat_spiflash_unmount_ro instead")));
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
+__attribute__((deprecated("esp_vfs_fat_rawflash_unmount is deprecated, please use esp_vfs_fat_spiflash_unmount_ro instead")))
+#endif
+;
 /** @endcond */
 
 #ifdef __cplusplus
