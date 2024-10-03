@@ -166,7 +166,9 @@ typedef enum {
                                 | TOUCH_PAD_INTR_MASK_DONE) /*!<All touch interrupt type enable. */
 #endif
 } touch_pad_intr_mask_t;
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 FLAG_ATTR(touch_pad_intr_mask_t)
+#endif
 
 typedef enum {
     TOUCH_PAD_DENOISE_BIT12 = 0,    /*!<Denoise range is 12bit */
