@@ -29,12 +29,14 @@ typedef struct {
  * backward compatibility
  * newer chips no longer require this typedef
  */
+#if !defined(_MSC_VER) /* #CUSTOM@NDRS */
 typedef esp_pm_config_t esp_pm_config_esp32_t   __attribute__((deprecated("please use esp_pm_config_t instead")));
 typedef esp_pm_config_t esp_pm_config_esp32s2_t __attribute__((deprecated("please use esp_pm_config_t instead")));
 typedef esp_pm_config_t esp_pm_config_esp32s3_t __attribute__((deprecated("please use esp_pm_config_t instead")));
 typedef esp_pm_config_t esp_pm_config_esp32c3_t __attribute__((deprecated("please use esp_pm_config_t instead")));
 typedef esp_pm_config_t esp_pm_config_esp32c2_t __attribute__((deprecated("please use esp_pm_config_t instead")));
 typedef esp_pm_config_t esp_pm_config_esp32c6_t __attribute__((deprecated("please use esp_pm_config_t instead")));
+#endif
 
 /**
  * @brief Power management constraints
