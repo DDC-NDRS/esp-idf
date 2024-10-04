@@ -51,7 +51,9 @@ typedef enum {
 #endif
     TIMER_INTR_NONE = 0
 } timer_intr_t;
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 FLAG_ATTR(timer_intr_t)
+#endif
 
 /**
  * @brief Timer count direction
