@@ -25,7 +25,9 @@ extern "C" {
  *
  * @return true if the DRAM and IRAM are sharing the same memory space, false otherwise
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static bool esp_dram_match_iram(void) {
     return (SOC_DRAM_LOW == SOC_IRAM_LOW && SOC_DRAM_HIGH == SOC_IRAM_HIGH);
 }
@@ -37,7 +39,9 @@ inline static bool esp_dram_match_iram(void) {
  *
  * @return true: is in iram; false: not in iram
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static bool esp_ptr_in_iram(const void *p) {
 #if CONFIG_IDF_TARGET_ESP32 && CONFIG_FREERTOS_UNICORE
     return ((intptr_t)p >= SOC_CACHE_APP_LOW && (intptr_t)p < SOC_IRAM_HIGH);
@@ -53,7 +57,9 @@ inline static bool esp_ptr_in_iram(const void *p) {
  *
  * @return true: is in dram; false: not in dram
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static bool esp_ptr_in_dram(const void *p) {
     return ((intptr_t)p >= SOC_DRAM_LOW && (intptr_t)p < SOC_DRAM_HIGH);
 }
@@ -65,7 +71,9 @@ inline static bool esp_ptr_in_dram(const void *p) {
  *
  * @return true: is in diram_dram; false: not in diram_dram
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static bool esp_ptr_in_diram_dram(const void *p) {
     return ((intptr_t)p >= SOC_DIRAM_DRAM_LOW && (intptr_t)p < SOC_DIRAM_DRAM_HIGH);
 }
@@ -77,7 +85,9 @@ inline static bool esp_ptr_in_diram_dram(const void *p) {
  *
  * @return true: is in diram_iram; false: not in diram_iram
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static bool esp_ptr_in_diram_iram(const void *p) {
 // TODO: IDF-5980 esp32c6 D/I RAM share the same address
 #if SOC_DIRAM_IRAM_LOW == SOC_DIRAM_DRAM_LOW
@@ -94,7 +104,9 @@ inline static bool esp_ptr_in_diram_iram(const void *p) {
  *
  * @return true: is in rtc_iram_fast; false: not in rtc_iram_fast
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static bool esp_ptr_in_rtc_iram_fast(const void *p) {
 #if SOC_RTC_FAST_MEM_SUPPORTED
     return ((intptr_t)p >= SOC_RTC_IRAM_LOW && (intptr_t)p < SOC_RTC_IRAM_HIGH);
@@ -110,7 +122,9 @@ inline static bool esp_ptr_in_rtc_iram_fast(const void *p) {
  *
  * @return true: is in rtc_dram_fast; false: not in rtc_dram_fast
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static bool esp_ptr_in_rtc_dram_fast(const void *p) {
 #if SOC_RTC_FAST_MEM_SUPPORTED
     return ((intptr_t)p >= SOC_RTC_DRAM_LOW && (intptr_t)p < SOC_RTC_DRAM_HIGH);
@@ -126,7 +140,9 @@ inline static bool esp_ptr_in_rtc_dram_fast(const void *p) {
  *
  * @return true: is in rtc_slow; false: not in rtc_slow
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static bool esp_ptr_in_rtc_slow(const void *p) {
 #if SOC_RTC_SLOW_MEM_SUPPORTED
     return ((intptr_t)p >= SOC_RTC_DATA_LOW && (intptr_t)p < SOC_RTC_DATA_HIGH);
@@ -141,7 +157,9 @@ inline static bool esp_ptr_in_rtc_slow(const void *p) {
    - Address must be word aligned
    - Address must pass esp_ptr_in_diram_dram() test, or result will be invalid pointer
 */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static void * esp_ptr_diram_dram_to_iram(const void *p) {
 #if SOC_DIRAM_INVERTED
     return (void *) ( SOC_DIRAM_IRAM_LOW + (SOC_DIRAM_DRAM_HIGH - (intptr_t)p) - 4);
@@ -155,7 +173,9 @@ inline static void * esp_ptr_diram_dram_to_iram(const void *p) {
    - Address must be word aligned
    - Address must pass esp_ptr_in_diram_iram() test, or result will be invalid pointer
 */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static void * esp_ptr_diram_iram_to_dram(const void *p) {
 #if SOC_DIRAM_INVERTED
     return (void *) ( SOC_DIRAM_DRAM_LOW + (SOC_DIRAM_IRAM_HIGH - (intptr_t)p) - 4);
@@ -174,7 +194,9 @@ inline static void * esp_ptr_diram_iram_to_dram(const void *p) {
  *
  * @return true: capable; false: not capable
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static bool esp_ptr_dma_capable(const void *p)
 {
     return (intptr_t)p >= SOC_DMA_LOW && (intptr_t)p < SOC_DMA_HIGH;
@@ -196,7 +218,9 @@ bool esp_ptr_dma_ext_capable(const void *p);
  *
  * @return true: aligned; false: not aligned
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static bool esp_ptr_word_aligned(const void *p)
 {
     return ((intptr_t)p) % 4 == 0;
@@ -209,7 +233,9 @@ inline static bool esp_ptr_word_aligned(const void *p)
  *
  * @return true: is executable; false: not executable
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static bool esp_ptr_executable(const void *p)
 {
     intptr_t ip = (intptr_t) p;
@@ -241,7 +267,9 @@ bool esp_ptr_byte_accessible(const void *p);
  *
  * @return true: is in internal ram; false: not in internal ram
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static bool esp_ptr_internal(const void *p) {
     bool r;
     r = ((intptr_t)p >= SOC_MEM_INTERNAL_LOW && (intptr_t)p < SOC_MEM_INTERNAL_HIGH);
@@ -286,7 +314,9 @@ bool esp_ptr_external_ram(const void *p);
  *
  * @return true: is in drom; false: not in drom
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static bool esp_ptr_in_drom(const void *p) {
     int32_t drom_start_addr = SOC_DROM_LOW;
 #if CONFIG_ESP32S3_DATA_CACHE_16KB
@@ -308,7 +338,9 @@ inline static bool esp_ptr_in_drom(const void *p) {
  *
  * @return true: is in dram; false: not in dram
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static bool esp_stack_ptr_in_dram(uint32_t sp)
 {
     //Check if stack ptr is in between SOC_DRAM_LOW and SOC_DRAM_HIGH, and 16 byte aligned.
@@ -333,7 +365,9 @@ bool esp_stack_ptr_in_extram(uint32_t sp);
  *
  * @return true: is in sane; false: not in sane
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 inline static bool esp_stack_ptr_is_sane(uint32_t sp)
 {
     return esp_stack_ptr_in_dram(sp)
