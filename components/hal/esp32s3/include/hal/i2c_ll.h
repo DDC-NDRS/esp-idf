@@ -112,7 +112,9 @@ static inline void i2c_ll_cal_bus_clk(uint32_t source_clk, uint32_t bus_freq, i2
  *
  * @return None
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 static inline void i2c_ll_update(i2c_dev_t *hw)
 {
     hw->ctr.conf_upgate = 1;
@@ -560,7 +562,9 @@ static inline void i2c_ll_get_scl_timing(i2c_dev_t *hw, int *high_period, int *l
  *
  * @return None.
  */
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __attribute__((always_inline))
+#endif
 static inline void i2c_ll_write_txfifo(i2c_dev_t *hw, const uint8_t *ptr, uint8_t len)
 {
     for (int i = 0; i< len; i++) {
