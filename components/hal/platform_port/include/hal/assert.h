@@ -11,8 +11,10 @@
 extern "C" {
 #endif
 
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 extern void __assert_func(const char *file, int line, const char *func, const char *expr);
 extern void abort(void);
+#endif
 
 #ifndef __ASSERT_FUNC
 #ifdef __ASSERT_FUNCTION

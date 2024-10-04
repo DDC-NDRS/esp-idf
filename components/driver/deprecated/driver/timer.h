@@ -12,7 +12,7 @@
 #include "esp_err.h"
 #include "driver/timer_types_legacy.h"
 
-#if !CONFIG_GPTIMER_SUPPRESS_DEPRECATE_WARN
+#if !CONFIG_GPTIMER_SUPPRESS_DEPRECATE_WARN && !defined(_MSC_VER) /* #CUSTOM@NDRS */
 #warning "legacy timer group driver is deprecated, please migrate to driver/gptimer.h"
 #endif
 
