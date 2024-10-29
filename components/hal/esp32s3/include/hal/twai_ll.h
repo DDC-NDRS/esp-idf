@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2015-2022 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2015-2024 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -61,21 +61,21 @@ extern "C" {
 typedef union {
     struct {
         struct {
-            uint8_t dlc: 4;             //Data length code (0 to 8) of the frame
-            uint8_t self_reception: 1;  //This frame should be transmitted using self reception command
-            uint8_t single_shot: 1;     //This frame should be transmitted using single shot command
-            uint8_t rtr: 1;             //This frame is a remote transmission request
-            uint8_t frame_format: 1;    //Format of the frame (1 = extended, 0 = standard)
+            uint8_t dlc: 4;             // Data length code (0 to 8) of the frame
+            uint8_t self_reception: 1;  // This frame should be transmitted using self reception command
+            uint8_t single_shot: 1;     // This frame should be transmitted using single shot command
+            uint8_t rtr: 1;             // This frame is a remote transmission request
+            uint8_t frame_format: 1;    // Format of the frame (1 = extended, 0 = standard)
         };
         union {
             struct {
-                uint8_t id[2];          //11 bit standard frame identifier
-                uint8_t data[8];        //Data bytes (0 to 8)
+                uint8_t id[2];          // 11 bit standard frame identifier
+                uint8_t data[8];        // Data bytes (0 to 8)
                 uint8_t reserved8[2];
             } standard;
             struct {
-                uint8_t id[4];          //29 bit extended frame identifier
-                uint8_t data[8];        //Data bytes (0 to 8)
+                uint8_t id[4];          // 29 bit extended frame identifier
+                uint8_t data[8];        // Data bytes (0 to 8)
             } extended;
         };
     };
@@ -578,7 +578,7 @@ static inline void twai_ll_set_tx_buffer(twai_dev_t *hw, twai_ll_frame_buffer_t 
 }
 
 /**
- * @brief   Copy a received frame from the RX buffer for parsing
+ * @brief Copy a received frame from the RX buffer for parsing
  *
  * @param hw Start address of the TWAI registers
  * @param rx_frame Pointer to store formatted frame
@@ -588,7 +588,7 @@ static inline void twai_ll_set_tx_buffer(twai_dev_t *hw, twai_ll_frame_buffer_t 
 __attribute__((always_inline))
 static inline void twai_ll_get_rx_buffer(twai_dev_t *hw, twai_ll_frame_buffer_t *rx_frame)
 {
-    //Copy RX buffer registers into frame
+    // Copy RX buffer registers into frame
     for (int i = 0; i < 13; i++) {
         rx_frame->bytes[i] =  HAL_FORCE_READ_U32_REG_FIELD(hw->tx_rx_buffer[i], byte);
     }
@@ -611,7 +611,7 @@ static inline void twai_ll_get_rx_buffer(twai_dev_t *hw, twai_ll_frame_buffer_t 
  */
 __attribute__((always_inline))
 static inline void twai_ll_format_frame_buffer(uint32_t id, uint8_t dlc, const uint8_t *data,
-                                              uint32_t flags, twai_ll_frame_buffer_t *tx_frame)
+                                               uint32_t flags, twai_ll_frame_buffer_t *tx_frame)
 {
     bool is_extd = flags & TWAI_MSG_FLAG_EXTD;
     bool is_rtr = flags & TWAI_MSG_FLAG_RTR;
@@ -623,7 +623,7 @@ static inline void twai_ll_format_frame_buffer(uint32_t id, uint8_t dlc, const u
     tx_frame->self_reception = (flags & TWAI_MSG_FLAG_SELF) ? 1 : 0;
     tx_frame->single_shot = (flags & TWAI_MSG_FLAG_SS) ? 1 : 0;
 
-    //Set ID. The ID registers are big endian and left aligned, therefore a bswap will be required
+    // Set ID. The ID registers are big endian and left aligned, therefore a bswap will be required
     if (is_extd) {
         uint32_t id_temp = HAL_SWAP32((id & TWAI_EXTD_ID_MASK) << 3); //((id << 3) >> 8*(3-i))
         for (int i = 0; i < 4; i++) {
@@ -655,9 +655,11 @@ static inline void twai_ll_format_frame_buffer(uint32_t id, uint8_t dlc, const u
  */
 __attribute__((always_inline))
 static inline void twai_ll_parse_frame_buffer(twai_ll_frame_buffer_t *rx_frame, uint32_t *id, uint8_t *dlc,
-                                             uint8_t *data, uint32_t *flags)
+                                              uint8_t *data, uint32_t *flags)
 {
-    //Copy frame information
+    uint8_t *data_buffer;
+
+    // Copy frame information
     *dlc = rx_frame->dlc;
     uint32_t flags_temp = 0;
     flags_temp |= (rx_frame->frame_format) ? TWAI_MSG_FLAG_EXTD : 0;
@@ -665,30 +667,30 @@ static inline void twai_ll_parse_frame_buffer(twai_ll_frame_buffer_t *rx_frame, 
     flags_temp |= (rx_frame->dlc > TWAI_FRAME_MAX_DLC) ? TWAI_MSG_FLAG_DLC_NON_COMP : 0;
     *flags = flags_temp;
 
-    //Copy ID. The ID registers are big endian and left aligned, therefore a bswap will be required
+    // Copy ID. The ID registers are big endian and left aligned, therefore a bswap will be required
     if (rx_frame->frame_format) {
-        uint32_t id_temp = 0;
-        for (int i = 0; i < 4; i++) {
-            id_temp |= rx_frame->extended.id[i] << (8 * i);
-        }
-        id_temp = HAL_SWAP32(id_temp) >> 3;  //((byte[i] << 8*(3-i)) >> 3)
+        uint32_t id_temp = (rx_frame->extended.id[0] << 24) |
+                           (rx_frame->extended.id[1] << 16) |
+                           (rx_frame->extended.id[2] <<  8) |
+                           (rx_frame->extended.id[3] <<  0);
+        id_temp = id_temp >> 3;
         *id = id_temp & TWAI_EXTD_ID_MASK;
+        data_buffer = rx_frame->extended.data;
     } else {
-        uint32_t id_temp = 0;
-        for (int i = 0; i < 2; i++) {
-            id_temp |= rx_frame->standard.id[i] << (8 * i);
-        }
-        id_temp = HAL_SWAP16(id_temp) >> 5;  //((byte[i] << 8*(1-i)) >> 5)
+        uint32_t id_temp = (rx_frame->standard.id[0] << 8) |
+                           (rx_frame->standard.id[1] << 0);
+        id_temp = id_temp >> 5;
         *id = id_temp & TWAI_STD_ID_MASK;
+        data_buffer = rx_frame->standard.data;
     }
 
-    uint8_t *data_buffer = (rx_frame->frame_format) ? rx_frame->extended.data : rx_frame->standard.data;
-    //Only copy data if the frame is a data frame (i.e. not a remote frame)
+    // Only copy data if the frame is a data frame (i.e. not a remote frame)
     int data_length = (rx_frame->rtr) ? 0 : ((rx_frame->dlc > TWAI_FRAME_MAX_DLC) ? TWAI_FRAME_MAX_DLC : rx_frame->dlc);
     for (int i = 0; i < data_length; i++) {
         data[i] = data_buffer[i];
     }
-    //Set remaining bytes of data to 0
+
+    // Set remaining bytes of data to 0
     for (int i = data_length; i < TWAI_FRAME_MAX_DLC; i++) {
         data[i] = 0;
     }
