@@ -29,7 +29,7 @@
 #include "esp_rom_gpio.h"
 
 /* ---------------------------- Definitions --------------------------------- */
-#define CONFIG_TWAI_CHECK_ENABLED      0         // Enable runtime checks #CUSTOM@SIKOR
+#define CONFIG_TWAI_CHECK_ENABLED      1         // Enable runtime checks #CUSTOM@SIKOR
 
 #if (CONFIG_TWAI_CHECK_ENABLED == 1)
 // Internal Macros
