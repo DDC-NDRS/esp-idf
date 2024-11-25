@@ -29,19 +29,28 @@
 #include "esp_rom_gpio.h"
 
 /* ---------------------------- Definitions --------------------------------- */
-//Internal Macros
+#define CONFIG_TWAI_CHECK_ENABLED      0         // Enable runtime checks #CUSTOM@SIKOR
+
+#if (CONFIG_TWAI_CHECK_ENABLED == 1)
+// Internal Macros
 #define TWAI_TAG "TWAI"
 #define TWAI_CHECK(cond, ret_val) ({                                        \
             if (!(cond)) {                                                  \
                 return (ret_val);                                           \
             }                                                               \
 })
+
 #define TWAI_CHECK_FROM_CRIT(cond, ret_val) ({                              \
             if (!(cond)) {                                                  \
                 TWAI_EXIT_CRITICAL();                                       \
                 return ret_val;                                             \
             }                                                               \
 })
+#else
+#define TWAI_CHECK(cond, ret_val)           do {} while(0)
+#define TWAI_CHECK_FROM_CRIT(cond, ret_val) do {} while(0)
+#endif //CONFIG_TWAI_CHECK_ENABLED
+
 #define TWAI_SET_FLAG(var, mask)    ((var) |= (mask))
 #define TWAI_RESET_FLAG(var, mask)  ((var) &= ~(mask))
 #ifdef CONFIG_TWAI_ISR_IN_IRAM
@@ -126,26 +135,26 @@ TWAI_ISR_ATTR static void twai_alert_handler(uint32_t alert_code, int *alert_req
 TWAI_ISR_ATTR
 static inline void twai_handle_rx_buffer_frames(BaseType_t *task_woken, int *alert_req)
 {
-#ifdef SOC_TWAI_SUPPORTS_RX_STATUS
+    #ifdef SOC_TWAI_SUPPORTS_RX_STATUS
     uint32_t msg_count = twai_hal_get_rx_msg_count(&twai_context);
 
     for (uint32_t i = 0; i < msg_count; i++) {
         twai_hal_frame_t frame;
         if (twai_hal_read_rx_buffer_and_clear(&twai_context, &frame)) {
-            //Valid frame copied from RX buffer
+            // Valid frame copied from RX buffer
             if (xQueueSendFromISR(p_twai_obj->rx_queue, &frame, task_woken) == pdTRUE) {
                 p_twai_obj->rx_msg_count++;
                 twai_alert_handler(TWAI_ALERT_RX_DATA, alert_req);
-            } else {    //Failed to send to queue
+            } else { // Failed to send to queue
                 p_twai_obj->rx_missed_count++;
                 twai_alert_handler(TWAI_ALERT_RX_QUEUE_FULL, alert_req);
             }
-        } else {    //Failed to read from RX buffer because message is overrun
+        } else { // Failed to read from RX buffer because message is overrun
             p_twai_obj->rx_overrun_count++;
             twai_alert_handler(TWAI_ALERT_RX_FIFO_OVERRUN, alert_req);
         }
     }
-#else   //SOC_TWAI_SUPPORTS_RX_STATUS
+    #else   //SOC_TWAI_SUPPORTS_RX_STATUS
     uint32_t msg_count = twai_hal_get_rx_msg_count(&twai_context);
     bool overrun = false;
     //Clear all valid RX frames
@@ -211,13 +220,14 @@ TWAI_ISR_ATTR static void twai_intr_handler_main(void *arg)
     int alert_req = 0;
     uint32_t events;
     TWAI_ENTER_CRITICAL_ISR();
-    if (p_twai_obj == NULL) {    //In case intr occurs whilst driver is being uninstalled
+    if (p_twai_obj == NULL) {    // In case intr occurs whilst driver is being uninstalled
         TWAI_EXIT_CRITICAL_ISR();
         return;
     }
-    events = twai_hal_get_events(&twai_context);    //Get the events that triggered the interrupt
 
-#if defined(CONFIG_TWAI_ERRATA_FIX_RX_FRAME_INVALID) || defined(CONFIG_TWAI_ERRATA_FIX_RX_FIFO_CORRUPT)
+    events = twai_hal_get_events(&twai_context);    // Get the events that triggered the interrupt
+
+    #if defined(CONFIG_TWAI_ERRATA_FIX_RX_FRAME_INVALID) || defined(CONFIG_TWAI_ERRATA_FIX_RX_FIFO_CORRUPT)
     if (events & TWAI_HAL_EVENT_NEED_PERIPH_RESET) {
         twai_hal_prepare_for_reset(&twai_context);
         periph_module_reset(p_twai_obj->module);
@@ -225,59 +235,69 @@ TWAI_ISR_ATTR static void twai_intr_handler_main(void *arg)
         p_twai_obj->rx_missed_count += twai_hal_get_reset_lost_rx_cnt(&twai_context);
         twai_alert_handler(TWAI_ALERT_PERIPH_RESET, &alert_req);
     }
-#endif
+    #endif
+
     if (events & TWAI_HAL_EVENT_RX_BUFF_FRAME) {
-        //Note: This event will never occur if there is a periph reset event
+        // Note: This event will never occur if there is a periph reset event
         twai_handle_rx_buffer_frames(&task_woken, &alert_req);
     }
+
     if (events & TWAI_HAL_EVENT_TX_BUFF_FREE) {
         twai_handle_tx_buffer_frame(&task_woken, &alert_req);
     }
 
-    //Handle events that only require alerting (i.e. no handler)
+    // Handle events that only require alerting (i.e. no handler)
     if (events & TWAI_HAL_EVENT_BUS_OFF) {
         p_twai_obj->state = TWAI_STATE_BUS_OFF;
         twai_alert_handler(TWAI_ALERT_BUS_OFF, &alert_req);
     }
+
     if (events & TWAI_HAL_EVENT_BUS_RECOV_CPLT) {
         p_twai_obj->state = TWAI_STATE_STOPPED;
         twai_alert_handler(TWAI_ALERT_BUS_RECOVERED, &alert_req);
     }
+
     if (events & TWAI_HAL_EVENT_BUS_ERR) {
         p_twai_obj->bus_error_count++;
         twai_alert_handler(TWAI_ALERT_BUS_ERROR, &alert_req);
     }
+
     if (events & TWAI_HAL_EVENT_ARB_LOST) {
         p_twai_obj->arb_lost_count++;
         twai_alert_handler(TWAI_ALERT_ARB_LOST, &alert_req);
     }
+
     if (events & TWAI_HAL_EVENT_BUS_RECOV_PROGRESS) {
         //Bus-recovery in progress. TEC has dropped below error warning limit
         twai_alert_handler(TWAI_ALERT_RECOVERY_IN_PROGRESS, &alert_req);
     }
+
     if (events & TWAI_HAL_EVENT_ERROR_PASSIVE) {
         //Entered error passive
         twai_alert_handler(TWAI_ALERT_ERR_PASS, &alert_req);
     }
+
     if (events & TWAI_HAL_EVENT_ERROR_ACTIVE) {
         //Returned to error active
         twai_alert_handler(TWAI_ALERT_ERR_ACTIVE, &alert_req);
     }
+
     if (events & TWAI_HAL_EVENT_ABOVE_EWL) {
         //TEC or REC surpassed error warning limit
         twai_alert_handler(TWAI_ALERT_ABOVE_ERR_WARN, &alert_req);
     }
+
     if (events & TWAI_HAL_EVENT_BELOW_EWL) {
-        //TEC and REC are both below error warning
+        // TEC and REC are both below error warning
         twai_alert_handler(TWAI_ALERT_BELOW_ERR_WARN, &alert_req);
     }
-
     TWAI_EXIT_CRITICAL_ISR();
 
     if (p_twai_obj->alert_semphr != NULL && alert_req) {
-        //Give semaphore if alerts were triggered
+        // Give semaphore if alerts were triggered
         xSemaphoreGiveFromISR(p_twai_obj->alert_semphr, &task_woken);
     }
+
     if (task_woken == pdTRUE) {
         portYIELD_FROM_ISR();
     }
@@ -464,7 +484,7 @@ esp_err_t twai_driver_install(const twai_general_config_t *g_config, const twai_
     esp_clk_tree_src_get_freq_hz(clk_src, ESP_CLK_TREE_SRC_FREQ_PRECISION_CACHED, &clock_source_hz);
 
     //Check brp validation
-    uint32_t brp = t_config->brp;
+    __attribute__((unused)) uint32_t brp = t_config->brp;
     if (t_config->quanta_resolution_hz) {
         TWAI_CHECK(clock_source_hz % t_config->quanta_resolution_hz == 0, ESP_ERR_INVALID_ARG);
         brp = clock_source_hz / t_config->quanta_resolution_hz;
@@ -603,13 +623,13 @@ esp_err_t twai_stop(void)
 
 esp_err_t twai_transmit(const twai_message_t *message, TickType_t ticks_to_wait)
 {
-    //Check arguments
+    // Check arguments
     TWAI_CHECK(p_twai_obj != NULL, ESP_ERR_INVALID_STATE);
     TWAI_CHECK(message != NULL, ESP_ERR_INVALID_ARG);
     TWAI_CHECK((message->data_length_code <= TWAI_FRAME_MAX_DLC) || message->dlc_non_comp, ESP_ERR_INVALID_ARG);
 
     TWAI_ENTER_CRITICAL();
-    //Check State
+    // Check State
     TWAI_CHECK_FROM_CRIT(!(p_twai_obj->mode == TWAI_MODE_LISTEN_ONLY), ESP_ERR_NOT_SUPPORTED);
     TWAI_CHECK_FROM_CRIT(p_twai_obj->state == TWAI_STATE_RUNNING, ESP_ERR_INVALID_STATE);
     //Format frame
@@ -617,9 +637,9 @@ esp_err_t twai_transmit(const twai_message_t *message, TickType_t ticks_to_wait)
     twai_hal_frame_t tx_frame;
     twai_hal_format_frame(message, &tx_frame);
 
-    //Check if frame can be sent immediately
+    // Check if frame can be sent immediately
     if (p_twai_obj->tx_msg_count == 0) {
-        //No other frames waiting to transmit. Bypass queue and transmit immediately
+        // No other frames waiting to transmit. Bypass queue and transmit immediately
         twai_hal_set_tx_buffer_and_transmit(&twai_context, &tx_frame);
         p_twai_obj->tx_msg_count++;
         ret = ESP_OK;
@@ -628,27 +648,28 @@ esp_err_t twai_transmit(const twai_message_t *message, TickType_t ticks_to_wait)
 
     if (ret != ESP_OK) {
         if (p_twai_obj->tx_queue == NULL) {
-            //TX Queue is disabled and TX buffer is occupied, message was not sent
+            // TX Queue is disabled and TX buffer is occupied, message was not sent
             ret = ESP_FAIL;
         } else if (xQueueSend(p_twai_obj->tx_queue, &tx_frame, ticks_to_wait) == pdTRUE) {
-            //Copied to TX Queue
+            // Copied to TX Queue
             TWAI_ENTER_CRITICAL();
             if ((!twai_hal_check_state_flags(&twai_context, TWAI_HAL_STATE_FLAG_TX_BUFF_OCCUPIED)) && uxQueueMessagesWaiting(p_twai_obj->tx_queue) > 0) {
-                //If the TX buffer is free but the TX queue is not empty. Check if we need to manually start a transmission
-                if (twai_hal_check_state_flags(&twai_context, TWAI_HAL_STATE_FLAG_BUS_OFF) || !twai_hal_check_state_flags(&twai_context, TWAI_HAL_STATE_FLAG_RUNNING)) {
-                    //TX buffer became free due to bus-off or is no longer running. No need to start a transmission
+                // If the TX buffer is free but the TX queue is not empty. Check if we need to manually start a transmission
+                if (twai_hal_check_state_flags(&twai_context, TWAI_HAL_STATE_FLAG_BUS_OFF) ||
+                    !twai_hal_check_state_flags(&twai_context, TWAI_HAL_STATE_FLAG_RUNNING)) {
+                    // TX buffer became free due to bus-off or is no longer running. No need to start a transmission
                     ret = ESP_ERR_INVALID_STATE;
                 } else {
-                    //Manually start a transmission
+                    // Manually start a transmission
                     int res = xQueueReceive(p_twai_obj->tx_queue, &tx_frame, 0);
                     assert(res == pdTRUE);
-                    (void)res;
+                    (void) res;
                     twai_hal_set_tx_buffer_and_transmit(&twai_context, &tx_frame);
                     p_twai_obj->tx_msg_count++;
                     ret = ESP_OK;
                 }
             } else {
-                //Frame was copied to queue, waiting to be transmitted
+                // Frame was copied to queue, waiting to be transmitted
                 p_twai_obj->tx_msg_count++;
                 ret = ESP_OK;
             }
@@ -658,6 +679,7 @@ esp_err_t twai_transmit(const twai_message_t *message, TickType_t ticks_to_wait)
             ret = ESP_ERR_TIMEOUT;
         }
     }
+
     return ret;
 }
 
@@ -740,7 +762,7 @@ esp_err_t twai_initiate_recovery(void)
 
 esp_err_t twai_get_status_info(twai_status_info_t *status_info)
 {
-    //Check parameters and state
+    // Check parameters and state
     TWAI_CHECK(p_twai_obj != NULL, ESP_ERR_INVALID_STATE);
     TWAI_CHECK(status_info != NULL, ESP_ERR_INVALID_ARG);
 
@@ -764,6 +786,11 @@ esp_err_t twai_get_status_info(twai_status_info_t *status_info)
     TWAI_EXIT_CRITICAL();
 
     return ESP_OK;
+}
+
+twai_state_t twai_get_state(void)
+{
+    return (p_twai_obj->state);
 }
 
 esp_err_t twai_clear_transmit_queue(void)

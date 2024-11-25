@@ -568,12 +568,32 @@ static inline void twai_ll_set_acc_filter(twai_dev_t *hw, uint32_t code, uint32_
  *
  * @note Call twai_ll_format_frame_buffer() to format a frame
  */
+#define CONFIG_TWAI_LL_SET_TX_BUFFER_LOOP_UNROLL    1
+#define CONFIG_TWAI_LL_GET_RX_BUFFER_LOOP_UNROLL    1
+
 __attribute__((always_inline))
 static inline void twai_ll_set_tx_buffer(twai_dev_t *hw, twai_ll_frame_buffer_t *tx_frame)
 {
-    //Copy formatted frame into TX buffer
-    for (int i = 0; i < 13; i++) {
-        hw->tx_rx_buffer[i].val = tx_frame->bytes[i];
+    if (CONFIG_TWAI_LL_SET_TX_BUFFER_LOOP_UNROLL == 1) {
+        hw->tx_rx_buffer[0].val  = tx_frame->bytes[0];
+        hw->tx_rx_buffer[1].val  = tx_frame->bytes[1];
+        hw->tx_rx_buffer[2].val  = tx_frame->bytes[2];
+        hw->tx_rx_buffer[3].val  = tx_frame->bytes[3];
+        hw->tx_rx_buffer[4].val  = tx_frame->bytes[4];
+        hw->tx_rx_buffer[5].val  = tx_frame->bytes[5];
+        hw->tx_rx_buffer[6].val  = tx_frame->bytes[6];
+        hw->tx_rx_buffer[7].val  = tx_frame->bytes[7];
+        hw->tx_rx_buffer[8].val  = tx_frame->bytes[8];
+        hw->tx_rx_buffer[9].val  = tx_frame->bytes[9];
+        hw->tx_rx_buffer[10].val = tx_frame->bytes[10];
+        hw->tx_rx_buffer[11].val = tx_frame->bytes[11];
+        hw->tx_rx_buffer[12].val = tx_frame->bytes[12];
+    }
+    else {
+        // Copy formatted frame into TX buffer
+        for (int i = 0; i < 13; i++) {
+            hw->tx_rx_buffer[i].val = tx_frame->bytes[i];
+        }
     }
 }
 
@@ -588,9 +608,26 @@ static inline void twai_ll_set_tx_buffer(twai_dev_t *hw, twai_ll_frame_buffer_t 
 __attribute__((always_inline))
 static inline void twai_ll_get_rx_buffer(twai_dev_t *hw, twai_ll_frame_buffer_t *rx_frame)
 {
-    // Copy RX buffer registers into frame
-    for (int i = 0; i < 13; i++) {
-        rx_frame->bytes[i] =  HAL_FORCE_READ_U32_REG_FIELD(hw->tx_rx_buffer[i], byte);
+    if (CONFIG_TWAI_LL_GET_RX_BUFFER_LOOP_UNROLL == 1) {
+        rx_frame->bytes[0]  =  HAL_FORCE_READ_U32_REG_FIELD(hw->tx_rx_buffer[0] , byte);
+        rx_frame->bytes[1]  =  HAL_FORCE_READ_U32_REG_FIELD(hw->tx_rx_buffer[1] , byte);
+        rx_frame->bytes[2]  =  HAL_FORCE_READ_U32_REG_FIELD(hw->tx_rx_buffer[2] , byte);
+        rx_frame->bytes[3]  =  HAL_FORCE_READ_U32_REG_FIELD(hw->tx_rx_buffer[3] , byte);
+        rx_frame->bytes[4]  =  HAL_FORCE_READ_U32_REG_FIELD(hw->tx_rx_buffer[4] , byte);
+        rx_frame->bytes[5]  =  HAL_FORCE_READ_U32_REG_FIELD(hw->tx_rx_buffer[5] , byte);
+        rx_frame->bytes[6]  =  HAL_FORCE_READ_U32_REG_FIELD(hw->tx_rx_buffer[6] , byte);
+        rx_frame->bytes[7]  =  HAL_FORCE_READ_U32_REG_FIELD(hw->tx_rx_buffer[7] , byte);
+        rx_frame->bytes[8]  =  HAL_FORCE_READ_U32_REG_FIELD(hw->tx_rx_buffer[8] , byte);
+        rx_frame->bytes[9]  =  HAL_FORCE_READ_U32_REG_FIELD(hw->tx_rx_buffer[9] , byte);
+        rx_frame->bytes[10] =  HAL_FORCE_READ_U32_REG_FIELD(hw->tx_rx_buffer[10], byte);
+        rx_frame->bytes[11] =  HAL_FORCE_READ_U32_REG_FIELD(hw->tx_rx_buffer[11], byte);
+        rx_frame->bytes[12] =  HAL_FORCE_READ_U32_REG_FIELD(hw->tx_rx_buffer[12], byte);
+    }
+    else {
+        // Copy RX buffer registers into frame
+        for (int i = 0; i < 13; i++) {
+            rx_frame->bytes[i] =  HAL_FORCE_READ_U32_REG_FIELD(hw->tx_rx_buffer[i], byte);
+        }
     }
 }
 
@@ -616,7 +653,7 @@ static inline void twai_ll_format_frame_buffer(uint32_t id, uint8_t dlc, const u
     bool is_extd = flags & TWAI_MSG_FLAG_EXTD;
     bool is_rtr = flags & TWAI_MSG_FLAG_RTR;
 
-    //Set frame information
+    // Set frame information
     tx_frame->dlc = dlc;
     tx_frame->frame_format = is_extd;
     tx_frame->rtr = is_rtr;
@@ -625,23 +662,31 @@ static inline void twai_ll_format_frame_buffer(uint32_t id, uint8_t dlc, const u
 
     // Set ID. The ID registers are big endian and left aligned, therefore a bswap will be required
     if (is_extd) {
-        uint32_t id_temp = HAL_SWAP32((id & TWAI_EXTD_ID_MASK) << 3); //((id << 3) >> 8*(3-i))
-        for (int i = 0; i < 4; i++) {
-            tx_frame->extended.id[i] = (id_temp >> (8 * i)) & 0xFF;
-        }
+        uint32_t id_temp = HAL_SWAP32((id & TWAI_EXTD_ID_MASK) << 3); // ((id << 3) >> 8*(3-i))
+
+        tx_frame->extended.id[0] = (id_temp >> (8 * 0)) & 0xFF;
+        tx_frame->extended.id[1] = (id_temp >> (8 * 1)) & 0xFF;
+        tx_frame->extended.id[2] = (id_temp >> (8 * 2)) & 0xFF;
+        tx_frame->extended.id[3] = (id_temp >> (8 * 3)) & 0xFF;
     } else {
-        uint32_t id_temp =  HAL_SWAP16((id & TWAI_STD_ID_MASK) << 5); //((id << 5) >> 8*(1-i))
-        for (int i = 0; i < 2; i++) {
-            tx_frame->standard.id[i] = (id_temp >> (8 * i)) & 0xFF;
-        }
+        uint32_t id_temp = HAL_SWAP16((id & TWAI_STD_ID_MASK) << 5); // ((id << 5) >> 8*(1-i))
+
+        tx_frame->standard.id[0] = (id_temp >> (8 * 0)) & 0xFF;
+        tx_frame->standard.id[1] = (id_temp >> (8 * 1)) & 0xFF;
     }
 
     uint8_t *data_buffer = (is_extd) ? tx_frame->extended.data : tx_frame->standard.data;
-    if (!is_rtr) {  //Only copy data if the frame is a data frame (i.e not a remote frame)
-        for (int i = 0; (i < dlc) && (i < TWAI_FRAME_MAX_DLC); i++) {
-            data_buffer[i] = data[i];
-        }
-    }
+
+    // #CUSTOM@SIKOR intentionally to overwrite the data_buffer with the data at MAX 8 bytes
+    // Compare to loop operation, this is faster
+    data_buffer[0] = data[0];
+    data_buffer[1] = data[1];
+    data_buffer[2] = data[2];
+    data_buffer[3] = data[3];
+    data_buffer[4] = data[4];
+    data_buffer[5] = data[5];
+    data_buffer[6] = data[6];
+    data_buffer[7] = data[7];
 }
 
 /**
@@ -684,16 +729,15 @@ static inline void twai_ll_parse_frame_buffer(twai_ll_frame_buffer_t *rx_frame, 
         data_buffer = rx_frame->standard.data;
     }
 
-    // Only copy data if the frame is a data frame (i.e. not a remote frame)
-    int data_length = (rx_frame->rtr) ? 0 : ((rx_frame->dlc > TWAI_FRAME_MAX_DLC) ? TWAI_FRAME_MAX_DLC : rx_frame->dlc);
-    for (int i = 0; i < data_length; i++) {
-        data[i] = data_buffer[i];
-    }
-
-    // Set remaining bytes of data to 0
-    for (int i = data_length; i < TWAI_FRAME_MAX_DLC; i++) {
-        data[i] = 0;
-    }
+    // Blindly copy all of data_buffer into data, it more efficient than checking dlc
+    data[0] = data_buffer[0];
+    data[1] = data_buffer[1];
+    data[2] = data_buffer[2];
+    data[3] = data_buffer[3];
+    data[4] = data_buffer[4];
+    data[5] = data_buffer[5];
+    data[6] = data_buffer[6];
+    data[7] = data_buffer[7];
 }
 
 /* ----------------------- RX Message Count Register ------------------------ */

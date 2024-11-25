@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2015-2022 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2015-2025 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -306,6 +306,13 @@ esp_err_t twai_initiate_recovery(void);
  *      - ESP_ERR_INVALID_STATE: TWAI driver is not installed
  */
 esp_err_t twai_get_status_info(twai_status_info_t *status_info);
+
+/**
+ * @brief   Get current state of the TWAI driver
+ *
+ * @return  Current state of the TWAI driver
+ */
+twai_state_t twai_get_state(void);          /* #CUSTOM@SIKOR */
 
 /**
  * @brief   Clear the transmit queue
