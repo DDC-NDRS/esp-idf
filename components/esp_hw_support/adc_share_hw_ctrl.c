@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2019-2024 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2019-2025 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -158,14 +158,18 @@ esp_err_t adc_lock_release(adc_unit_t adc_unit)
 
 esp_err_t adc_lock_try_acquire(adc_unit_t adc_unit)
 {
+    int ret;
+
     if (adc_unit == ADC_UNIT_1) {
-        if (_lock_try_acquire(&adc1_lock) == -1) {
+        ret = _lock_try_acquire(&adc1_lock);
+        if (ret == -1) {
             return ESP_ERR_TIMEOUT;
         }
     }
 
     if (adc_unit == ADC_UNIT_2) {
-        if (_lock_try_acquire(&adc2_lock) == -1) {
+        ret = _lock_try_acquire(&adc2_lock);
+        if (ret == -1) {
             return ESP_ERR_TIMEOUT;
         }
     }
