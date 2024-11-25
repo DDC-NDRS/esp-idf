@@ -28,12 +28,12 @@ extern "C" {
 #define TWAI_HAL_CLEAR_BITS(var, flag)          ((var) &= ~(flag))
 
 //HAL state flags
-#define TWAI_HAL_STATE_FLAG_RUNNING             (1 << 0)    //Controller is active (not in reset mode)
-#define TWAI_HAL_STATE_FLAG_RECOVERING          (1 << 1)    //Bus is undergoing bus recovery
-#define TWAI_HAL_STATE_FLAG_ERR_WARN            (1 << 2)    //TEC or REC is >= error warning limit
-#define TWAI_HAL_STATE_FLAG_ERR_PASSIVE         (1 << 3)    //TEC or REC is >= 128
-#define TWAI_HAL_STATE_FLAG_BUS_OFF             (1 << 4)    //Bus-off due to TEC >= 256
-#define TWAI_HAL_STATE_FLAG_TX_BUFF_OCCUPIED    (1 << 5)    //Transmit buffer is occupied
+#define TWAI_HAL_STATE_FLAG_RUNNING             (1 << 0)    // Controller is active (not in reset mode)
+#define TWAI_HAL_STATE_FLAG_RECOVERING          (1 << 1)    // Bus is undergoing bus recovery
+#define TWAI_HAL_STATE_FLAG_ERR_WARN            (1 << 2)    // TEC or REC is >= error warning limit
+#define TWAI_HAL_STATE_FLAG_ERR_PASSIVE         (1 << 3)    // TEC or REC is >= 128
+#define TWAI_HAL_STATE_FLAG_BUS_OFF             (1 << 4)    // Bus-off due to TEC >= 256
+#define TWAI_HAL_STATE_FLAG_TX_BUFF_OCCUPIED    (1 << 5)    // Transmit buffer is occupied
 #if defined(CONFIG_TWAI_ERRATA_FIX_RX_FRAME_INVALID) || defined(CONFIG_TWAI_ERRATA_FIX_RX_FIFO_CORRUPT)
 #define TWAI_HAL_STATE_FLAG_TX_NEED_RETRY       (1 << 7)    //TX needs to be restarted due to errata workarounds
 #endif
@@ -238,7 +238,7 @@ uint32_t twai_hal_get_events(twai_hal_context_t *hal_ctx);
  */
 static inline void twai_hal_format_frame(const twai_message_t *message, twai_hal_frame_t *frame)
 {
-    //Direct call to ll function
+    // Direct call to ll function
     twai_ll_format_frame_buffer(message->identifier, message->data_length_code, message->data,
                                 message->flags, frame);
 }
