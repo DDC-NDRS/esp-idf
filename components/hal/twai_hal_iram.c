@@ -174,9 +174,10 @@ void twai_hal_recover_from_reset(twai_hal_context_t *hal_ctx)
 
 void twai_hal_set_tx_buffer_and_transmit(twai_hal_context_t *hal_ctx, twai_hal_frame_t *tx_frame)
 {
-    //Copy frame into tx buffer
+    // Copy frame into tx buffer
     twai_ll_set_tx_buffer(hal_ctx->dev, tx_frame);
-    //Hit the send command
+
+    // Hit the send command
     if (tx_frame->self_reception) {
         if (tx_frame->single_shot) {
             twai_ll_set_cmd_self_rx_single_shot(hal_ctx->dev);
@@ -189,8 +190,9 @@ void twai_hal_set_tx_buffer_and_transmit(twai_hal_context_t *hal_ctx, twai_hal_f
         twai_ll_set_cmd_tx(hal_ctx->dev);
     }
     TWAI_HAL_SET_BITS(hal_ctx->state_flags, TWAI_HAL_STATE_FLAG_TX_BUFF_OCCUPIED);
-#if defined(CONFIG_TWAI_ERRATA_FIX_RX_FRAME_INVALID) || defined(CONFIG_TWAI_ERRATA_FIX_RX_FIFO_CORRUPT)
+
+    #if defined(CONFIG_TWAI_ERRATA_FIX_RX_FRAME_INVALID) || defined(CONFIG_TWAI_ERRATA_FIX_RX_FIFO_CORRUPT)
     //Save transmitted frame in case we need to retry
     memcpy(&hal_ctx->tx_frame_save, tx_frame, sizeof(twai_hal_frame_t));
-#endif  //defined(CONFIG_TWAI_ERRATA_FIX_RX_FRAME_INVALID) || defined(CONFIG_TWAI_ERRATA_FIX_RX_FIFO_CORRUPT)
+    #endif  //defined(CONFIG_TWAI_ERRATA_FIX_RX_FRAME_INVALID) || defined(CONFIG_TWAI_ERRATA_FIX_RX_FIFO_CORRUPT)
 }
