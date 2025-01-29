@@ -62,45 +62,55 @@
 
 #define EV_STR(s) "================ "s" ================"
 
-//skip interrupt regs.
+// skip interrupt regs.
 #define SLAVE_ADDR(i)   ((i) >= 28? (i) + 4: (i))
 
 typedef enum {
-    JOB_IDLE = 0,
-    JOB_RESET = 1,
-    JOB_SEND_INT = 2,
+    JOB_IDLE      = 0,
+    JOB_RESET     = 1,
+    JOB_SEND_INT  = 2,
     JOB_WRITE_REG = 4,
 } example_job_t;
 
-static const char TAG[] = "example_slave";
+static char const TAG[] = "example_slave";
 static int s_job = JOB_IDLE;
 
-DMA_ATTR uint8_t data_to_send[BUFFER_SIZE] = {0x97, 0x84, 0x43, 0x67, 0xc1, 0xdd, 0xff, 0x01, 0x02, 0x03, 0x04, 0x05, 0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x99, 0x88, 0x77, 0x56, 0x55, 0x44, 0x33, 0x22, 0x11, 0x00 };
-DMA_ATTR uint8_t data_to_recv[BUFFER_SIZE] = {0x97, 0x84, 0x43, 0x67, 0xc1, 0xdd, 0xff, 0x01, 0x02, 0x03, 0x04, 0x05, 0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x99, 0x88, 0x77, 0x56, 0x55, 0x44, 0x33, 0x22, 0x11, 0x00 };
+DMA_ATTR uint8_t data_to_send[BUFFER_SIZE] = {
+    0x97, 0x84, 0x43, 0x67, 0xc1, 0xdd, 0xff, 0x01, 0x02, 0x03,
+    0x04, 0x05, 0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x99, 0x88,
+    0x77, 0x56, 0x55, 0x44, 0x33, 0x22, 0x11, 0x00
+};
 
-static const char job_desc[][32] = {
+DMA_ATTR uint8_t data_to_recv[BUFFER_SIZE] = {
+    0x97, 0x84, 0x43, 0x67, 0xc1, 0xdd, 0xff, 0x01, 0x02, 0x03,
+    0x04, 0x05, 0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x99, 0x88,
+    0x77, 0x56, 0x55, 0x44, 0x33, 0x22, 0x11, 0x00
+};
+
+static char const job_desc[][32] = {
     "JOB_IDLE",
     "JOB_RESET",
     "JOB_SEND_INT",
     "JOB_WRITE_REG",
 };
 
-//reset counters of the slave hardware, and clean the receive buffer (normally they should be sent back to the host)
-static esp_err_t slave_reset(void)
-{
+// reset counters of the slave hardware, and clean the receive buffer (normally they should be sent back to the host)
+static esp_err_t slave_reset(void) {
     esp_err_t ret;
+
     sdio_slave_stop();
     ret = sdio_slave_reset();
     if (ret != ESP_OK) {
         return ret;
     }
+
     ret = sdio_slave_start();
     if (ret != ESP_OK) {
         return ret;
     }
 
-    //Since the buffer will not be sent any more, we return them back to receving driver
-    while (1) {
+    // Since the buffer will not be sent any more, we return them back to receving driver
+    while (true) {
         sdio_slave_buf_handle_t handle;
         ret = sdio_slave_send_get_finished(&handle, 0);
         if (ret != ESP_OK) {
@@ -112,13 +122,12 @@ static esp_err_t slave_reset(void)
     return ESP_OK;
 }
 
-//sent interrupts to the host in turns
-static esp_err_t task_hostint(void)
-{
+// sent interrupts to the host in turns
+static esp_err_t task_hostint(void) {
     for (int i = 0; i < 8; i++) {
         ESP_LOGV(TAG, "send intr: %d", i);
         sdio_slave_send_host_int(i);
-        //check reset for quick response to RESET signal
+        // check reset for quick response to RESET signal
         if (s_job & JOB_RESET) {
             break;
         }
@@ -127,11 +136,10 @@ static esp_err_t task_hostint(void)
     return ESP_OK;
 }
 
-//read the value in a specified register set by the host, and set other register according to this.
-//the host will read these registers later
-static esp_err_t task_write_reg(void)
-{
-    //the host write REG1, the slave should write its registers according to value of REG1
+// read the value in a specified register set by the host, and set other register according to this.
+// the host will read these registers later
+static esp_err_t task_write_reg(void) {
+    // the host write REG1, the slave should write its registers according to value of REG1
     uint8_t read = sdio_slave_read_reg(1);
     for (int i = 0; i < 60; i++) {
         sdio_slave_write_reg(SLAVE_ADDR(i), read + 3 * i);
@@ -145,47 +153,47 @@ static esp_err_t task_write_reg(void)
     return ESP_OK;
 }
 
-//we use the event callback (in ISR) in this example to get higer responding speed
-//note you can't do delay in the ISR
+// we use the event callback (in ISR) in this example to get higer responding speed
+// note you can't do delay in the ISR
 //``sdio_slave_wait_int`` is another way to handle interrupts
-static void event_cb(uint8_t pos)
-{
+static void event_cb(uint8_t pos) {
     ESP_EARLY_LOGD(TAG, "event: %d", pos);
     switch (pos) {
-    case 0:
-        s_job = sdio_slave_read_reg(0);
-        sdio_slave_write_reg(0, JOB_IDLE);
-        break;
+        case 0 :
+            s_job = sdio_slave_read_reg(0);
+            sdio_slave_write_reg(0, JOB_IDLE);
+            break;
     }
 }
 
 DMA_ATTR uint8_t buffer[BUFFER_NUM][BUFFER_SIZE] = {};
 
-//Main application
-void app_main(void)
-{
+// Main application
+void app_main(void) {
     esp_err_t ret;
 
     sdio_slave_config_t config = {
-        .sending_mode       = SDIO_SLAVE_SEND_PACKET,
-        .send_queue_size    = SDIO_SLAVE_QUEUE_SIZE,
-        .recv_buffer_size   = BUFFER_SIZE,
-        .event_cb           = event_cb,
+        .sending_mode     = SDIO_SLAVE_SEND_PACKET,
+        .send_queue_size  = SDIO_SLAVE_QUEUE_SIZE,
+        .recv_buffer_size = BUFFER_SIZE,
+        .event_cb         = event_cb,
+
         /* Note: For small devkits there may be no pullups on the board.
            This enables the internal pullups to help evaluate the driver
            quickly. However the internal pullups are not sufficient and not
            reliable, please make sure external pullups are connected to the
            bus in your real design.
         */
-        //.flags              = SDIO_SLAVE_FLAG_INTERNAL_PULLUP,
+        //.flags = SDIO_SLAVE_FLAG_INTERNAL_PULLUP,
     };
-#ifdef CONFIG_SDIO_DAT2_DISABLED
+
+    #ifdef CONFIG_SDIO_DAT2_DISABLED
     /* For slave chips with 3.3V flash, DAT2 pullup conflicts with the pulldown
        required by strapping pin (MTDI). We can either burn the EFUSE for the
        strapping or just disable the DAT2 and work in 1-bit mode.
      */
     config.flags |= SDIO_SLAVE_FLAG_DAT2_DISABLED;
-#endif
+    #endif
 
     ret = sdio_slave_initialize(&config);
     ESP_ERROR_CHECK(ret);
@@ -216,7 +224,7 @@ void app_main(void)
     ESP_LOGI(TAG, EV_STR("slave ready"));
 
     for (;;) {
-        const TickType_t non_blocking = 0, blocking = portMAX_DELAY;
+        TickType_t const non_blocking = 0, blocking = portMAX_DELAY;
         sdio_slave_buf_handle_t recv_queue[BUFFER_NUM];
         int packet_size = 0;
 
@@ -225,10 +233,11 @@ void app_main(void)
         if (ret != ESP_ERR_TIMEOUT) {
             recv_queue[packet_size++] = handle;
 
-            //Receive following buffers in the same packet in blocking mode.
-            //You can also skip this step and handle the data buffer by buffer, if the data is a stream or you don't care about the packet boundary.
+            // Receive following buffers in the same packet in blocking mode.
+            // You can also skip this step and handle the data buffer by buffer, if the data is a stream or you don't
+            // care about the packet boundary.
             while (ret == ESP_ERR_NOT_FINISHED) {
-                //The return value must be ESP_OK or ESP_ERR_NOT_FINISHED.
+                // The return value must be ESP_OK or ESP_ERR_NOT_FINISHED.
                 ret = sdio_slave_recv_packet(&handle, blocking);
                 recv_queue[packet_size++] = handle;
             }
@@ -245,20 +254,20 @@ void app_main(void)
 
             for (int i = 0; i < packet_size; i++) {
                 handle = recv_queue[i];
-                //handle data in the buffer, here we print them and send the same buffer back to the host
-                //receive data and send back to host.
+                // handle data in the buffer, here we print them and send the same buffer back to the host
+                // receive data and send back to host.
                 size_t length;
-                uint8_t *ptr = sdio_slave_recv_get_buf(handle, &length);
+                uint8_t* ptr = sdio_slave_recv_get_buf(handle, &length);
 
                 ESP_LOGI(TAG, "Buffer %d, len: %d", i, length);
                 ESP_LOG_BUFFER_HEXDUMP(TAG, ptr, length, ESP_LOG_INFO);
 
                 /* If buffer is no longer used, we can call sdio_slave_recv_load_buf to use it to receive data again.
-                * But here we wants to show how to share large buffers between drivers here (we share the buffer
-                * between sending and receiving), the buffer is kept until the buffer is sent by sending driver.
-                */
+                 * But here we wants to show how to share large buffers between drivers here (we share the buffer
+                 * between sending and receiving), the buffer is kept until the buffer is sent by sending driver.
+                 */
 
-                //the recv_buf_handle is used as the argument, so that we can easily load the same buffer to recv driver,
+                // the recv_buf_handle is used as the argument, so that we can easily load the same buffer to recv driver,
                 // after it's sent
 
                 void* send_args = handle;
@@ -277,7 +286,7 @@ void app_main(void)
             void* send_args = NULL;
             ret = sdio_slave_send_get_finished(&send_args, 0);
 
-            //extract the buffer handle from the sending args
+            // extract the buffer handle from the sending args
             sdio_slave_buf_handle_t handle = (sdio_slave_buf_handle_t)send_args;
             if (ret == ESP_ERR_TIMEOUT) {
                 break;
@@ -294,18 +303,20 @@ void app_main(void)
                     s_job &= ~BIT(i);
 
                     switch (BIT(i)) {
-                    case JOB_SEND_INT:
-                        ret = task_hostint();
-                        ESP_ERROR_CHECK(ret);
-                        break;
-                    case JOB_RESET:
-                        ret = slave_reset();
-                        ESP_ERROR_CHECK(ret);
-                        break;
-                    case JOB_WRITE_REG:
-                        ret = task_write_reg();
-                        ESP_ERROR_CHECK(ret);
-                        break;
+                        case JOB_SEND_INT :
+                            ret = task_hostint();
+                            ESP_ERROR_CHECK(ret);
+                            break;
+
+                        case JOB_RESET :
+                            ret = slave_reset();
+                            ESP_ERROR_CHECK(ret);
+                            break;
+
+                        case JOB_WRITE_REG :
+                            ret = task_write_reg();
+                            ESP_ERROR_CHECK(ret);
+                            break;
                     }
                 }
             }
