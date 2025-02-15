@@ -629,10 +629,23 @@ static inline void twai_ll_set_acc_filter(twai_dev_t *hw, uint32_t code, uint32_
 __attribute__((always_inline))
 static inline void twai_ll_set_tx_buffer(twai_dev_t *hw, twai_ll_frame_buffer_t *tx_frame)
 {
-    //Copy formatted frame into TX buffer
-    for (int i = 0; i < 13; i++) {
-        hw->tx_rx_buffer[i].val = tx_frame->bytes[i];
-    }
+    uint8_t* bytes = tx_frame->bytes;
+    union twai_tx_rx_buffer_t* tx_rx_buffer = (union twai_tx_rx_buffer_t*)hw->tx_rx_buffer;
+
+    // Copy formatted frame into TX buffer
+    tx_rx_buffer[0].val = bytes[0];
+    tx_rx_buffer[1].val = bytes[1];
+    tx_rx_buffer[2].val = bytes[2];
+    tx_rx_buffer[3].val = bytes[3];
+    tx_rx_buffer[4].val = bytes[4];
+    tx_rx_buffer[5].val = bytes[5];
+    tx_rx_buffer[6].val = bytes[6];
+    tx_rx_buffer[7].val = bytes[7];
+    tx_rx_buffer[8].val = bytes[8];
+    tx_rx_buffer[9].val = bytes[9];
+    tx_rx_buffer[10].val = bytes[10];
+    tx_rx_buffer[11].val = bytes[11];
+    tx_rx_buffer[12].val = bytes[12];
 }
 
 /**
