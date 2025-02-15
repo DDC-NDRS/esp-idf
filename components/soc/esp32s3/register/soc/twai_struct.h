@@ -171,7 +171,7 @@ typedef struct twai_dev_t {
             uint32_t reserved_6c;
             uint32_t reserved_70;
         } acceptance_filter;
-        union {
+        union twai_tx_rx_buffer_t {
             struct {
                 uint32_t byte: 8;               /* TX/RX Byte X [7:0] */
                 uint32_t reserved24: 24;        /* Internal Reserved */
