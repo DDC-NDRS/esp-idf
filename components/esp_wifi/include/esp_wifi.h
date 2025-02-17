@@ -1002,7 +1002,7 @@ esp_err_t esp_wifi_get_promiscuous_ctrl_filter(wifi_promiscuous_filter_t *filter
   *    - ESP_ERR_WIFI_STATE: WiFi still connecting when invoke esp_wifi_set_config
   *    - others: refer to the error code in esp_err.h
   */
-esp_err_t esp_wifi_set_config(wifi_interface_t interface, wifi_config_t *conf);
+esp_err_t esp_wifi_set_config(wifi_interface_t iface, wifi_config_t *conf);
 
 /**
   * @brief     Get configuration of specified interface
@@ -1016,7 +1016,7 @@ esp_err_t esp_wifi_set_config(wifi_interface_t interface, wifi_config_t *conf);
   *    - ESP_ERR_INVALID_ARG: invalid argument
   *    - ESP_ERR_WIFI_IF: invalid interface
   */
-esp_err_t esp_wifi_get_config(wifi_interface_t interface, wifi_config_t *conf);
+esp_err_t esp_wifi_get_config(wifi_interface_t iface, wifi_config_t *conf);
 
 /**
  * @brief Forward declare wifi_sta_list_t. The definition depends on the target device
@@ -1347,7 +1347,7 @@ esp_err_t esp_wifi_get_ant(wifi_ant_config_t *config) __attribute__((deprecated(
  *
  * @return     0 or the TSF time
  */
-int64_t esp_wifi_get_tsf_time(wifi_interface_t interface);
+int64_t esp_wifi_get_tsf_time(wifi_interface_t iface);
 
 /**
   * @brief     Set the inactive time of the STA or AP
