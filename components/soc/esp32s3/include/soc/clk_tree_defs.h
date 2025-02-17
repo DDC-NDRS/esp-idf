@@ -5,6 +5,8 @@
  */
 #pragma once
 
+#include "esp_compiler.h" /* #CUSTOM@NDRS */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
