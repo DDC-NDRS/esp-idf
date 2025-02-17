@@ -661,7 +661,11 @@ typedef struct {
     uint8_t length;          /**< Length of all bytes in the element data following this field. Minimum 4. */
     uint8_t vendor_oui[3];   /**< Vendor identifier (OUI). */
     uint8_t vendor_oui_type; /**< Vendor-specific OUI type. */
+    #if !defined(_MSC_VER) /* #CUSTOM@NDRS */
     uint8_t payload[0];      /**< Payload. Length is equal to value in 'length' field, minus 4. */
+    #else
+    uint8_t payload[1];
+    #endif
 } vendor_ie_data_t;
 
 /**
@@ -774,7 +778,11 @@ typedef struct {
     bool no_ack;                /**< Indicates no ack required */
     wifi_action_rx_cb_t rx_cb;  /**< Rx Callback to receive any response */
     uint32_t data_len;          /**< Length of the appended Data */
+    #if !defined(_MSC_VER) /* #CUSTOM@NDRS */
     uint8_t data[0];            /**< Appended Data payload */
+    #else
+    uint8_t data[1];
+    #endif
 } wifi_action_tx_req_t;
 
 /**
@@ -1314,7 +1322,11 @@ typedef struct {
 typedef struct {
     uint8_t report[ESP_WIFI_MAX_NEIGHBOR_REP_LEN];  /**< Neighbor Report received from the AP (will be deprecated in next major release, use n_report instead)*/
     uint16_t report_len;                            /**< Length of the report*/
+    #if !defined(_MSC_VER) /* #CUSTOM@NDRS */
     uint8_t n_report[];                             /**< Neighbor Report received from the AP*/
+    #else
+    uint8_t n_report[1];
+    #endif
 } wifi_event_neighbor_report_t;
 
 /** Argument structure for WIFI_EVENT_AP_WRONG_PASSWORD event */
