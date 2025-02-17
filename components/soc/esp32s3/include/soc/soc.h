@@ -46,6 +46,7 @@
 
 #ifndef __ASSEMBLER__
 
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 //write value to register
 #define REG_WRITE(_r, _v)  do {                                                                                        \
             (*(volatile uint32_t *)(_r)) = (_v);                                                                       \
@@ -55,6 +56,10 @@
 #define REG_READ(_r) ({                                                                                                \
             (*(volatile uint32_t *)(_r));                                                                              \
         })
+#else
+#define REG_WRITE(_r, _v)       (*(volatile uint32_t *)(_r)) = (_v)
+#define REG_READ(_r)            (*(volatile uint32_t *)(_r))
+#endif
 
 //get bit or get bits from register
 #define REG_GET_BIT(_r, _b)  ({                                                                                        \
@@ -81,10 +86,14 @@
             ((REG_READ(_r) >> (_f##_S)) & (_f##_V));                                                                   \
         })
 
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 //set field of a register from variable, uses field _S & _V to determine mask
 #define REG_SET_FIELD(_r, _f, _v) do {                                                                                 \
             REG_WRITE((_r),((REG_READ(_r) & ~((_f##_V) << (_f##_S)))|(((_v) & (_f##_V))<<(_f##_S))));                  \
         } while(0)
+#else
+#define REG_SET_FIELD(_r, _f, _v)   (REG_WRITE((_r),((REG_READ(_r) & ~((_f##_V) << (_f##_S)))|(((_v) & (_f##_V))<<(_f##_S)))))
+#endif
 
 //get field value from a variable, used when _f is not left shifted by _f##_S
 #define VALUE_GET_FIELD(_r, _f) (((_r) >> (_f##_S)) & (_f))
@@ -104,6 +113,7 @@
 //generate a value from a field value, used when _f is left shifted by _f##_S
 #define FIELD_TO_VALUE2(_f, _v) (((_v)<<_f##_S) & (_f))
 
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 //read value from register
 #define READ_PERI_REG(addr) ({                                                                                         \
             (*((volatile uint32_t *)ETS_UNCACHED_ADDR(addr)));                                                         \
@@ -113,7 +123,12 @@
 #define WRITE_PERI_REG(addr, val) do {                                                                                 \
             (*((volatile uint32_t *)ETS_UNCACHED_ADDR(addr))) = (uint32_t)(val);                                       \
         } while(0)
+#else
+#define WRITE_PERI_REG(addr, val)   (*((volatile uint32_t *)ETS_UNCACHED_ADDR(addr))) = (uint32_t)(val)
+#define READ_PERI_REG(addr)         (*((volatile uint32_t *)ETS_UNCACHED_ADDR(addr)))
+#endif
 
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 //clear bits of register controlled by mask
 #define CLEAR_PERI_REG_MASK(reg, mask)  do {                                                                           \
             WRITE_PERI_REG((reg), (READ_PERI_REG(reg)&(~(mask))));                                                     \
@@ -123,7 +138,15 @@
 #define SET_PERI_REG_MASK(reg, mask) do {                                                                              \
             WRITE_PERI_REG((reg), (READ_PERI_REG(reg)|(mask)));                                                        \
         } while(0)
+#else
+//clear bits of register controlled by mask
+#define CLEAR_PERI_REG_MASK(reg, mask)      WRITE_PERI_REG((reg), (READ_PERI_REG(reg)&(~(mask))))
 
+//set bits of register controlled by mask
+#define SET_PERI_REG_MASK(reg, mask)        WRITE_PERI_REG((reg), (READ_PERI_REG(reg)|(mask)))
+#endif
+
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 //get bits of register controlled by mask
 #define GET_PERI_REG_MASK(reg, mask) ({                                                                                \
             (READ_PERI_REG(reg) & (mask));                                                                             \
@@ -133,6 +156,14 @@
 #define GET_PERI_REG_BITS(reg, hipos,lowpos) ({                                                                        \
             ((READ_PERI_REG(reg)>>(lowpos))&((1<<((hipos)-(lowpos)+1))-1));                                            \
         })
+#else
+//get bits of register controlled by mask
+#define GET_PERI_REG_MASK(reg, mask)        (READ_PERI_REG(reg) & (mask))
+
+//get bits of register controlled by highest bit and lowest bit
+#define GET_PERI_REG_BITS(reg, hipos,lowpos) \
+    ((READ_PERI_REG(reg) >> (lowpos)) & ((1 << ((hipos) - (lowpos) + 1)) - 1))
+#endif
 
 //set bits of register controlled by mask and shift
 #define SET_PERI_REG_BITS(reg,bit_map,value,shift) do {                                                                \
@@ -140,9 +171,15 @@
         } while(0)
 
 //get field of register
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 #define GET_PERI_REG_BITS2(reg, mask,shift) ({                                                                         \
             ((READ_PERI_REG(reg)>>(shift))&(mask));                                                                    \
         })
+#else
+static inline uint32_t GET_PERI_REG_BITS2(uint32_t reg, uint32_t mask, uint32_t shift) {
+    return (READ_PERI_REG(reg) >> shift) & mask;
+}
+#endif
 
 #endif /* !__ASSEMBLER__ */
 //}}
@@ -161,6 +198,7 @@
 #define  TIMER_CLK_FREQ                              (80000000>>4) //80MHz divided by 16
 #define  SPI_CLK_DIV                                 4
 #define  TICKS_PER_US_ROM                            40              // CPU is 80MHz
+#define  GPIO_MATRIX_DELAY_NS                        0
 //}}
 
 /* Overall memory map */
