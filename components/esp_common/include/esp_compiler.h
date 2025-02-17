@@ -29,6 +29,8 @@ static inline int __builtin_ffs(int x) {
     return 0; // If no bits are set, return 0
 }
 
+#ifndef __BUILTIN_FFS_DEFINED
+#define __BUILTIN_FFS_DEFINED
 static inline int __builtin_clzll(unsigned long long int x) {
     if (x == 0) {
         // If x is 0, return 64.
@@ -48,6 +50,7 @@ static inline int __builtin_clzll(unsigned long long int x) {
         return __builtin_clz(lower) + 32;
     }
 }
+#endif
 
 #endif
 
