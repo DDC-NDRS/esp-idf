@@ -111,6 +111,7 @@
  * @note This function only swaps *pulDestination with ulExchange, if previous
  *       *pulDestination value equals ulComparand.
  */
+[[maybe_unused]]
 static portFORCE_INLINE uint32_t Atomic_CompareAndSwap_u32( uint32_t volatile * pulDestination,
                                                             uint32_t ulExchange,
                                                             uint32_t ulComparand )
@@ -147,6 +148,7 @@ static portFORCE_INLINE uint32_t Atomic_CompareAndSwap_u32( uint32_t volatile * 
  *
  * @return The initial value of *ppvDestination.
  */
+[[maybe_unused]]
 static portFORCE_INLINE void * Atomic_SwapPointers_p32( void * volatile * ppvDestination,
                                                         void * pvExchange )
 {
@@ -179,6 +181,7 @@ static portFORCE_INLINE void * Atomic_SwapPointers_p32( void * volatile * ppvDes
  * @note This function only swaps *ppvDestination with pvExchange, if previous
  *       *ppvDestination value equals pvComparand.
  */
+[[maybe_unused]]
 static portFORCE_INLINE uint32_t Atomic_CompareAndSwapPointers_p32( void * volatile * ppvDestination,
                                                                     void * pvExchange,
                                                                     void * pvComparand )
@@ -212,6 +215,7 @@ static portFORCE_INLINE uint32_t Atomic_CompareAndSwapPointers_p32( void * volat
  *
  * @return previous *pulAddend value.
  */
+[[maybe_unused]]
 static portFORCE_INLINE uint32_t Atomic_Add_u32( uint32_t volatile * pulAddend,
                                                  uint32_t ulCount )
 {
@@ -240,6 +244,7 @@ static portFORCE_INLINE uint32_t Atomic_Add_u32( uint32_t volatile * pulAddend,
  *
  * @return previous *pulAddend value.
  */
+[[maybe_unused]]
 static portFORCE_INLINE uint32_t Atomic_Subtract_u32( uint32_t volatile * pulAddend,
                                                       uint32_t ulCount )
 {
@@ -266,6 +271,7 @@ static portFORCE_INLINE uint32_t Atomic_Subtract_u32( uint32_t volatile * pulAdd
  *
  * @return *pulAddend value before increment.
  */
+[[maybe_unused]]
 static portFORCE_INLINE uint32_t Atomic_Increment_u32( uint32_t volatile * pulAddend )
 {
     uint32_t ulCurrent;
@@ -291,6 +297,7 @@ static portFORCE_INLINE uint32_t Atomic_Increment_u32( uint32_t volatile * pulAd
  *
  * @return *pulAddend value before decrement.
  */
+[[maybe_unused]]
 static portFORCE_INLINE uint32_t Atomic_Decrement_u32( uint32_t volatile * pulAddend )
 {
     uint32_t ulCurrent;
@@ -318,6 +325,7 @@ static portFORCE_INLINE uint32_t Atomic_Decrement_u32( uint32_t volatile * pulAd
  *
  * @return The original value of *pulDestination.
  */
+[[maybe_unused]]
 static portFORCE_INLINE uint32_t Atomic_OR_u32( uint32_t volatile * pulDestination,
                                                 uint32_t ulValue )
 {
@@ -345,6 +353,7 @@ static portFORCE_INLINE uint32_t Atomic_OR_u32( uint32_t volatile * pulDestinati
  *
  * @return The original value of *pulDestination.
  */
+[[maybe_unused]]
 static portFORCE_INLINE uint32_t Atomic_AND_u32( uint32_t volatile * pulDestination,
                                                  uint32_t ulValue )
 {
@@ -372,6 +381,7 @@ static portFORCE_INLINE uint32_t Atomic_AND_u32( uint32_t volatile * pulDestinat
  *
  * @return The original value of *pulDestination.
  */
+[[maybe_unused]]
 static portFORCE_INLINE uint32_t Atomic_NAND_u32( uint32_t volatile * pulDestination,
                                                   uint32_t ulValue )
 {
@@ -399,6 +409,7 @@ static portFORCE_INLINE uint32_t Atomic_NAND_u32( uint32_t volatile * pulDestina
  *
  * @return The original value of *pulDestination.
  */
+[[maybe_unused]]
 static portFORCE_INLINE uint32_t Atomic_XOR_u32( uint32_t volatile * pulDestination,
                                                  uint32_t ulValue )
 {
