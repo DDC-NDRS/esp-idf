@@ -125,7 +125,7 @@ typedef struct {
  *
  */
 typedef struct {
-
+    uint32_t dummy;
 } esp_console_dev_usb_serial_jtag_config_t;
 
 #define ESP_CONSOLE_DEV_USB_SERIAL_JTAG_CONFIG_DEFAULT() {}
