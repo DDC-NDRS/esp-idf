@@ -159,7 +159,7 @@ typedef struct wifi_osi_funcs_t {
     int32_t _magic;
 } wifi_osi_funcs_t;
 
-extern wifi_osi_funcs_t g_wifi_osi_funcs;
+extern wifi_osi_funcs_t const g_wifi_osi_funcs;
 
 #ifdef __cplusplus
 }
