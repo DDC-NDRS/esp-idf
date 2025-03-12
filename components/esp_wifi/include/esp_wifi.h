@@ -95,7 +95,7 @@ typedef struct wifi_osi_funcs_t wifi_osi_funcs_t;
  * @brief WiFi stack configuration parameters passed to esp_wifi_init call.
  */
 typedef struct {
-    wifi_osi_funcs_t*      osi_funcs;              /**< WiFi OS functions */
+    wifi_osi_funcs_t const* osi_funcs;             /**< WiFi OS functions */
     wpa_crypto_funcs_t     wpa_crypto_funcs;       /**< WiFi station crypto functions when connect */
     int                    static_rx_buf_num;      /**< WiFi static RX buffer number */
     int                    dynamic_rx_buf_num;     /**< WiFi dynamic RX buffer number */
@@ -184,7 +184,7 @@ typedef struct {
 #endif
 
 extern const wpa_crypto_funcs_t g_wifi_default_wpa_crypto_funcs;
-extern wifi_osi_funcs_t g_wifi_osi_funcs;
+extern wifi_osi_funcs_t const g_wifi_osi_funcs;
 
 #define WIFI_INIT_CONFIG_MAGIC    0x1F2F3F4F
 
