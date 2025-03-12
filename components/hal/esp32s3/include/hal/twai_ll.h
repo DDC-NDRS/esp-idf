@@ -806,8 +806,6 @@ static inline void twai_ll_parse_frame_buffer(twai_ll_frame_buffer_t *rx_frame, 
         data_buffer = rx_frame->standard.data;
     }
 
-    uint8_t* data_buffer = (rx_frame->frame_format) ? rx_frame->extended.data : rx_frame->standard.data;
-
     // Only copy data if the frame is a data frame (i.e. not a remote frame)
     int data_length = (rx_frame->rtr) ? 0 : ((rx_frame->dlc > TWAI_FRAME_MAX_DLC) ? TWAI_FRAME_MAX_DLC : rx_frame->dlc);
     data_length = (data_length < buf_sz) ? data_length : buf_sz;
