@@ -953,7 +953,8 @@
       "license": "GPL-2.0-only",
       "name": "qemu-xtensa",
       "supported_targets": [
-        "esp32"
+        "esp32",
+        "esp32s3"
       ],
       "version_cmd": [
         "qemu-system-xtensa",
@@ -982,12 +983,12 @@
             "size": 3456764,
             "url": "https://github.com/espressif/qemu/releases/download/esp-develop-9.0.0-20240606/qemu-xtensa-softmmu-esp_develop_9.0.0_20240606-aarch64-apple-darwin.tar.xz"
           },
-          "name": "esp_develop_9.0.0_20240606",
+          "name": "esp_develop_9.2.2_20250228",
           "status": "recommended",
           "win64": {
-            "sha256": "281659f7a1d49761ac6f54d0aeb14366cb93c002f21948b847a0e15c0b8f5425",
-            "size": 33957256,
-            "url": "https://github.com/espressif/qemu/releases/download/esp-develop-9.0.0-20240606/qemu-xtensa-softmmu-esp_develop_9.0.0_20240606-x86_64-w64-mingw32.tar.xz"
+            "sha256": "814977dee2dca3a5767eb772783ffd49c023ccfe1201b39205b5eec64b8b8fda",
+            "size": 34387172,
+            "url": "https://github.com/espressif/qemu/releases/download/esp-develop-9.2.2-20250228/qemu-xtensa-softmmu-esp_develop_9.2.2_20250228-x86_64-w64-mingw32.tar.xz"
           }
         }
       ]
