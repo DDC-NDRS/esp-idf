@@ -107,6 +107,8 @@
                                                 StaticTask_t * const pxTaskBuffer,
                                                 const BaseType_t xCoreID );
 
+    BaseType_t xTaskCreateRestrictedPinnedToCore( const TaskParameters_t * const pxTaskDefinition, TaskHandle_t *pxCreatedTask, const BaseType_t xCoreID);
+
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
 /* ------------------------------------------------- Task Utilities ------------------------------------------------- */

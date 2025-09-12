@@ -7,9 +7,14 @@
 #ifndef _ESP_WPA2_H
 #define _ESP_WPA2_H
 
+#define ESP_WPA2_SUPPRESS_DEPRECATE_WARN
+
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 #pragma message("esp_wpa2.h is deprecated. Use esp_eap_client.h instead.")
+#endif
 
 #include "esp_eap_client.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -27,7 +32,9 @@ extern "C" {
   *    - ESP_OK: succeed.
   *    - ESP_ERR_NO_MEM: fail(internal memory malloc fail)
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_wifi_sta_enterprise_enable' instead")))
+#endif
 esp_err_t esp_wifi_sta_wpa2_ent_enable(void);
 
 /**
@@ -42,7 +49,9 @@ esp_err_t esp_wifi_sta_wpa2_ent_enable(void);
   * @return
   *    - ESP_OK: succeed.
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_wifi_sta_enterprise_disable' instead")))
+#endif
 esp_err_t esp_wifi_sta_wpa2_ent_disable(void);
 
 /**
@@ -61,7 +70,9 @@ esp_err_t esp_wifi_sta_wpa2_ent_disable(void);
   *    - ESP_ERR_INVALID_ARG: fail(len <= 0 or len >= 128)
   *    - ESP_ERR_NO_MEM: fail(internal memory malloc fail)
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_set_identity' instead")))
+#endif
 esp_err_t esp_wifi_sta_wpa2_ent_set_identity(const unsigned char *identity, int len);
 
 /**
@@ -71,7 +82,9 @@ esp_err_t esp_wifi_sta_wpa2_ent_set_identity(const unsigned char *identity, int 
   *             Please use `esp_eap_client_clear_identity` instead.
   *
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_clear_identity' instead")))
+#endif
 void esp_wifi_sta_wpa2_ent_clear_identity(void);
 
 /**
@@ -88,7 +101,9 @@ void esp_wifi_sta_wpa2_ent_clear_identity(void);
   *    - ESP_ERR_INVALID_ARG: fail(len <= 0 or len >= 128)
   *    - ESP_ERR_NO_MEM: fail(internal memory malloc fail)
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_set_username' instead")))
+#endif
 esp_err_t esp_wifi_sta_wpa2_ent_set_username(const unsigned char *username, int len);
 
 /**
@@ -97,7 +112,9 @@ esp_err_t esp_wifi_sta_wpa2_ent_set_username(const unsigned char *username, int 
   *             Please use `esp_eap_client_clear_username` instead.
   *
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_clear_username' instead")))
+#endif
 void esp_wifi_sta_wpa2_ent_clear_username(void);
 
 /**
@@ -114,7 +131,9 @@ void esp_wifi_sta_wpa2_ent_clear_username(void);
   *    - ESP_ERR_INVALID_ARG: fail(len <= 0)
   *    - ESP_ERR_NO_MEM: fail(internal memory malloc fail)
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_set_password' instead")))
+#endif
 esp_err_t esp_wifi_sta_wpa2_ent_set_password(const unsigned char *password, int len);
 
 /**
@@ -123,7 +142,9 @@ esp_err_t esp_wifi_sta_wpa2_ent_set_password(const unsigned char *password, int 
   * @deprecated This function is deprecated and will be removed in the future.
   *             Please use `esp_eap_client_clear_password` instead.
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_clear_password' instead")))
+#endif
 void esp_wifi_sta_wpa2_ent_clear_password(void);
 
 /**
@@ -142,7 +163,9 @@ void esp_wifi_sta_wpa2_ent_clear_password(void);
   *    - ESP_ERR_INVALID_ARG: fail(len <= 0)
   *    - ESP_ERR_NO_MEM: fail(internal memory malloc fail)
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_set_new_password' instead")))
+#endif
 esp_err_t esp_wifi_sta_wpa2_ent_set_new_password(const unsigned char *new_password, int len);
 
 /**
@@ -152,7 +175,9 @@ esp_err_t esp_wifi_sta_wpa2_ent_set_new_password(const unsigned char *new_passwo
   *             Please use `esp_eap_client_clear_new_password` instead.
   *
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_clear_new_password' instead")))
+#endif
 void esp_wifi_sta_wpa2_ent_clear_new_password(void);
 
 /**
@@ -170,7 +195,9 @@ void esp_wifi_sta_wpa2_ent_clear_new_password(void);
   * @return
   *    - ESP_OK: succeed
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_set_ca_cert' instead")))
+#endif
 esp_err_t esp_wifi_sta_wpa2_ent_set_ca_cert(const unsigned char *ca_cert, int ca_cert_len);
 
 /**
@@ -180,7 +207,9 @@ esp_err_t esp_wifi_sta_wpa2_ent_set_ca_cert(const unsigned char *ca_cert, int ca
   *             Please use `esp_eap_client_clear_ca_cert` instead.
   *
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_clear_ca_cert' instead")))
+#endif
 void esp_wifi_sta_wpa2_ent_clear_ca_cert(void);
 
 /**
@@ -202,7 +231,9 @@ void esp_wifi_sta_wpa2_ent_clear_ca_cert(void);
   * @return
   *    - ESP_OK: succeed
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_set_certificate_and_key' instead")))
+#endif
 esp_err_t esp_wifi_sta_wpa2_ent_set_cert_key(const unsigned char *client_cert, int client_cert_len,
                                              const unsigned char *private_key, int private_key_len,
                                              const unsigned char *private_key_passwd, int private_key_passwd_len);
@@ -214,7 +245,9 @@ esp_err_t esp_wifi_sta_wpa2_ent_set_cert_key(const unsigned char *client_cert, i
   *             Please use `esp_eap_client_clear_certificate_and_key` instead.
   *
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_clear_certificate_and_key' instead")))
+#endif
 void esp_wifi_sta_wpa2_ent_clear_cert_key(void);
 
 /**
@@ -229,7 +262,9 @@ void esp_wifi_sta_wpa2_ent_clear_cert_key(void);
   * @return
   *    - ESP_OK: succeed
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_set_disable_time_check' instead")))
+#endif
 esp_err_t esp_wifi_sta_wpa2_ent_set_disable_time_check(bool disable);
 
 /**
@@ -243,7 +278,9 @@ esp_err_t esp_wifi_sta_wpa2_ent_set_disable_time_check(bool disable);
   * @return
   *    - ESP_OK: succeed
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_get_disable_time_check' instead")))
+#endif
 esp_err_t esp_wifi_sta_wpa2_ent_get_disable_time_check(bool *disable);
 
 /**
@@ -257,7 +294,9 @@ esp_err_t esp_wifi_sta_wpa2_ent_get_disable_time_check(bool *disable);
   * @return
   *    - ESP_OK: succeed
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_set_ttls_phase2_method' instead")))
+#endif
 esp_err_t esp_wifi_sta_wpa2_ent_set_ttls_phase2_method(esp_eap_ttls_phase2_types type);
 
 /**
@@ -271,7 +310,9 @@ esp_err_t esp_wifi_sta_wpa2_ent_set_ttls_phase2_method(esp_eap_ttls_phase2_types
   * @return
   *    - ESP_OK: succeed
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_set_suiteb_192bit_certification' instead")))
+#endif
 esp_err_t esp_wifi_sta_wpa2_set_suiteb_192bit_certification(bool enable);
 
 /**
@@ -290,7 +331,9 @@ esp_err_t esp_wifi_sta_wpa2_set_suiteb_192bit_certification(bool enable);
   *    - ESP_OK: succeed
   *    - ESP_ERR_NO_MEM: fail(internal memory malloc fail)
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_set_pac_file' instead")))
+#endif
 esp_err_t esp_wifi_sta_wpa2_ent_set_pac_file(const unsigned char *pac_file, int pac_file_len);
 
 /**
@@ -308,7 +351,9 @@ esp_err_t esp_wifi_sta_wpa2_ent_set_pac_file(const unsigned char *pac_file, int 
   *    - ESP_ERR_INVALID_ARG: fail(out of bound arguments)
   *    - ESP_ERR_NO_MEM: fail(internal memory malloc fail)
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_set_fast_params' instead")))
+#endif
 esp_err_t esp_wifi_sta_wpa2_ent_set_fast_phase1_params(esp_eap_fast_config config);
 
 /**
@@ -323,7 +368,9 @@ esp_err_t esp_wifi_sta_wpa2_ent_set_fast_phase1_params(esp_eap_fast_config confi
   *    - ESP_OK: succeed
   *    - ESP_FAIL: fail
   */
+#if !defined(ESP_WPA2_SUPPRESS_DEPRECATE_WARN)
 __attribute__((deprecated("Use 'esp_eap_client_use_default_cert_bundle' instead")))
+#endif
 esp_err_t esp_wifi_sta_wpa2_use_default_cert_bundle(bool use_default_bundle);
 
 #ifdef __cplusplus

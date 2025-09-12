@@ -24,6 +24,7 @@ entries:
         # Task Creation
         tasks:xTaskCreatePinnedToCore (default)
         tasks:xTaskCreateStaticPinnedToCore (default)
+        tasks:xTaskCreateRestrictedPinnedToCore (default)
         # Task Utilities
         tasks:xTaskGetCoreID (default)
         tasks:xTaskGetIdleTaskHandleForCore (default)
