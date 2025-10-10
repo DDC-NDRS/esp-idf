@@ -218,7 +218,11 @@ esp_err_t esp_vfs_fat_sdspi_mount(const char* base_path,
  *      - ESP_OK on success
  *      - ESP_ERR_INVALID_STATE if esp_vfs_fat_sdmmc_mount hasn't been called
  */
-esp_err_t esp_vfs_fat_sdmmc_unmount(void) __attribute__((deprecated("Please use esp_vfs_fat_sdcard_unmount instead")));
+esp_err_t esp_vfs_fat_sdmmc_unmount(void)
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
+__attribute__((deprecated("Please use esp_vfs_fat_sdcard_unmount instead")))
+#endif
+;
 
 /**
  * @brief Unmount an SD card from the FAT filesystem and release resources acquired using

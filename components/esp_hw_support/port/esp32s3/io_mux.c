@@ -22,7 +22,11 @@ esp_err_t io_mux_set_clock_source(soc_module_clk_t clk_src)
 }
 
 extern portMUX_TYPE rtc_spinlock;
+#if !defined(_MSC_VER) /* #CUSTOM@NDRS */
 static portMUX_TYPE s_io_mux_spinlock = portMUX_INITIALIZER_UNLOCKED;
+#else
+static portMUX_TYPE s_io_mux_spinlock;
+#endif
 
 static rtc_io_status_t s_rtc_io_status = {
     .rtc_io_enabled_cnt = { 0 },
