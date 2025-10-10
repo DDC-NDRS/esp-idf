@@ -29,6 +29,7 @@ static inline int __builtin_ffs(int x) {
     return 0; // If no bits are set, return 0
 }
 
+#if !defined(_MSC_VER) /* #CUSTOM@NDRS */
 #ifndef __BUILTIN_FFS_DEFINED
 #define __BUILTIN_FFS_DEFINED
 static inline int __builtin_clzll(unsigned long long int x) {
@@ -51,13 +52,14 @@ static inline int __builtin_clzll(unsigned long long int x) {
     }
 }
 #endif
+#endif
 
 #endif
 
 /*
  * The likely and unlikely macro pairs:
  * These macros are useful to place when application
- * knows the majority occurrence of a decision paths,
+ * knows the majority ocurrence of a decision paths,
  * placing one of these macros can hint the compiler
  * to reorder instructions producing more optimized
  * code.
