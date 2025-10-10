@@ -11,8 +11,10 @@
 extern "C" {
 #endif
 
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 extern void __assert_func(const char *file, int line, const char *func, const char *expr);
 extern void abort(void);
+#endif
 
 #ifndef __ASSERT_FUNC
 #ifdef __ASSERT_FUNCTION
@@ -31,7 +33,7 @@ extern void abort(void);
 #endif
 #endif
 
-#if IS_ULP_COCPU
+#if IS_ULP_COCPU || defined(_MSC_VER) /* #CUSTOM@NDRS */
 #define HAL_ASSERT(__e) ((void)(__e))
 #elif CONFIG_HAL_DEFAULT_ASSERTION_LEVEL == 1 // silent
 #define HAL_ASSERT(__e) (__builtin_expect(!!(__e), 1) ? (void)0 : abort())
