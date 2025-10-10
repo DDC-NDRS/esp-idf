@@ -497,6 +497,13 @@ esp_err_t twai_get_status_info(twai_status_info_t *status_info);
 esp_err_t twai_get_status_info_v2(twai_handle_t handle, twai_status_info_t *status_info);
 
 /**
+ * @brief   Get current state of the TWAI driver
+ *
+ * @return  Current state of the TWAI driver
+ */
+twai_state_t twai_get_state(void);          /* #CUSTOM@NDRS */
+
+/**
  * @brief   Clear the transmit queue
  *
  * This function will clear the transmit queue of all messages.
