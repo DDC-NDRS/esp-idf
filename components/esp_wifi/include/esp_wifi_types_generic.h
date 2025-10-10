@@ -19,6 +19,12 @@ extern "C" {
 
 #define WIFI_AP_DEFAULT_MAX_IDLE_PERIOD  292 /**< Default timeout for SoftAP BSS Max Idle. Unit: 1000TUs >**/
 
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#define ZERO_LEN_ARRAY  1
+#else
+#define ZERO_LEN_ARRAY
+#endif
+
 /**
   * @brief Wi-Fi mode type
   */
@@ -889,7 +895,7 @@ typedef enum {
 typedef struct {
     uint8_t wfa_oui[WIFI_OUI_LEN];  /**< WFA OUI - 0x50, 0x6F, 0x9A */
     wifi_nan_svc_proto_t proto;     /**< WFA defined protocol types */
-    uint8_t payload[0];             /**< Service Info payload */
+    uint8_t payload[ZERO_LEN_ARRAY];/**< Service Info payload */
 } wifi_nan_wfa_ssi_t;
 
 /**
@@ -1380,7 +1386,7 @@ typedef struct {
     uint32_t reserved_2;        /**< Reserved */
     uint8_t ssi_version;        /**< Indicates version of SSI in Publish instance, 0 if not available */
     uint16_t ssi_len;           /**< Length of service specific info */
-    uint8_t ssi[];              /**< Service specific info of Publisher */
+    uint8_t ssi[ZERO_LEN_ARRAY];/**< Service specific info of Publisher */
 } wifi_event_nan_svc_match_t;
 
 /**
@@ -1393,7 +1399,7 @@ typedef struct {
     uint32_t reserved_1;        /**< Reserved */
     uint32_t reserved_2;        /**< Reserved */
     uint16_t ssi_len;           /**< Length of service specific info */
-    uint8_t ssi[];              /**< Service specific info of Subscriber */
+    uint8_t ssi[ZERO_LEN_ARRAY];/**< Service specific info of Subscriber */
 } wifi_event_nan_replied_t;
 
 /**
@@ -1407,7 +1413,7 @@ typedef struct {
     uint32_t reserved_1;                             /**< Reserved */
     uint32_t reserved_2;                             /**< Reserved */
     uint16_t ssi_len;                                /**< Length of service specific info */
-    uint8_t ssi[];                                   /**< Service specific info from Follow-up */
+    uint8_t ssi[ZERO_LEN_ARRAY];                     /**< Service specific info from Follow-up */
 } wifi_event_nan_receive_t;
 
 /**
@@ -1422,7 +1428,7 @@ typedef struct {
     uint32_t reserved_1;                        /**< Reserved */
     uint32_t reserved_2;                        /**< Reserved */
     uint16_t ssi_len;                           /**< Length of service specific info */
-    uint8_t ssi[];                              /**< Service specific info from NDP/NDPE Attribute */
+    uint8_t ssi[ZERO_LEN_ARRAY];                /**< Service specific info from NDP/NDPE Attribute */
 } wifi_event_ndp_indication_t;
 
 /**
@@ -1438,7 +1444,7 @@ typedef struct {
     uint32_t reserved_1;                        /**< Reserved */
     uint32_t reserved_2;                        /**< Reserved */
     uint16_t ssi_len;                           /**< Length of Service Specific Info */
-    uint8_t ssi[];                              /**< Service specific info from NDP/NDPE Attribute */
+    uint8_t ssi[ZERO_LEN_ARRAY];                /**< Service specific info from NDP/NDPE Attribute */
 } wifi_event_ndp_confirm_t;
 
 /**
@@ -1539,7 +1545,7 @@ typedef struct {
 /** Argument structure for WIFI_EVENT_DPP_URI_READY event */
 typedef struct {
     uint32_t uri_data_len;       /**< URI data length including null termination */
-    char uri[];                  /**< URI data */
+    char uri[ZERO_LEN_ARRAY];    /**< URI data */
 } wifi_event_dpp_uri_ready_t;
 
 /** Argument structure for WIFI_EVENT_DPP_CFG_RECVD event */
