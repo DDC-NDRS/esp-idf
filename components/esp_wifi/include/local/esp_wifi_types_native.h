@@ -109,7 +109,7 @@ typedef struct {
  */
 typedef struct {
     wifi_pkt_rx_ctrl_t rx_ctrl; /**< metadata header */
-    #if defined(__GUNC__)
+    #if !defined(_MSC_VER) /* #CUSTOM@NDRS */
     uint8_t payload[0];       /**< Data or management payload. Length of payload is described by rx_ctrl.sig_len. Type of content determined by packet type argument of callback. */
     #else
     uint8_t payload[1];

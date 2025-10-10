@@ -742,7 +742,7 @@ static inline void twai_ll_format_frame_buffer(uint32_t id, uint8_t dlc, const u
 
     uint8_t* data_buffer = (is_extd) ? tx_frame->extended.data : tx_frame->standard.data;
 
-    // #CUSTOM@SIKOR intentionally to overwrite the data_buffer with the data at MAX 8 bytes
+    // #CUSTOM@NDRS intentionally to overwrite the data_buffer with the data at MAX 8 bytes
     // Compare to loop operation, this is faster
     data_buffer[0] = data[0];
     data_buffer[1] = data[1];
