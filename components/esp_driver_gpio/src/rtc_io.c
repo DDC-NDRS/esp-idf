@@ -20,7 +20,11 @@
 #include "soc/lp_gpio_pins.h"
 #endif
 
-static const char __attribute__((__unused__)) *RTCIO_TAG = "RTCIO";
+static const char
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
+__attribute__((__unused__))
+#endif
+*RTCIO_TAG = "RTCIO";
 
 extern portMUX_TYPE rtc_spinlock; //TODO: Will be placed in the appropriate position after the rtc module is finished.
 #define RTCIO_ENTER_CRITICAL()  portENTER_CRITICAL(&rtc_spinlock)
