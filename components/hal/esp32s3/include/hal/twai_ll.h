@@ -153,7 +153,10 @@ static inline void twai_ll_enable_bus_clock(int group_id, bool enable)
 
 /// use a macro to wrap the function, force the caller to use it in a critical section
 /// the critical section needs to declare the __DECLARE_RCC_ATOMIC_ENV variable in advance
-#define twai_ll_enable_bus_clock(...) (void)__DECLARE_RCC_ATOMIC_ENV; twai_ll_enable_bus_clock(__VA_ARGS__)
+#define twai_ll_enable_bus_clock(...) do { \
+        (void)__DECLARE_RCC_ATOMIC_ENV; \
+        twai_ll_enable_bus_clock(__VA_ARGS__); \
+    } while(0)
 
 /**
  * @brief Reset the twai module
@@ -169,7 +172,10 @@ static inline void twai_ll_reset_register(int group_id)
 
 /// use a macro to wrap the function, force the caller to use it in a critical section
 /// the critical section needs to declare the __DECLARE_RCC_ATOMIC_ENV variable in advance
-#define twai_ll_reset_register(...) (void)__DECLARE_RCC_ATOMIC_ENV; twai_ll_reset_register(__VA_ARGS__)
+#define twai_ll_reset_register(...) do { \
+        (void)__DECLARE_RCC_ATOMIC_ENV; \
+        twai_ll_reset_register(__VA_ARGS__); \
+    } while(0)
 
 /* ---------------------------- Peripheral Control Register ----------------- */
 
@@ -775,8 +781,6 @@ static inline bool twai_ll_frame_is_ext_format(twai_ll_frame_buffer_t *rx_frame)
 __attribute__((always_inline))
 static inline void twai_ll_parse_frame_header(const twai_ll_frame_buffer_t *rx_frame, twai_frame_header_t *header)
 {
-    uint8_t* data_buffer;
-
     // Copy frame information
     header->dlc = rx_frame->dlc;
     header->ide = rx_frame->frame_format;
@@ -794,13 +798,11 @@ static inline void twai_ll_parse_frame_header(const twai_ll_frame_buffer_t *rx_f
                            (rx_frame->extended.id[3] <<  0);
         id_temp = id_temp >> 3;
         header->id = id_temp & TWAI_EXTD_ID_MASK;
-        data_buffer = rx_frame->extended.data;
     } else {
         uint32_t id_temp = (rx_frame->standard.id[0] << 8) |
                            (rx_frame->standard.id[1] << 0);
         id_temp = id_temp >> 5;
         header->id = id_temp & TWAI_STD_ID_MASK;
-        data_buffer = rx_frame->standard.data;
     }
 }
 
