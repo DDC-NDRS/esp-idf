@@ -6,7 +6,9 @@
 
 #pragma once
 
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 #include "esp_vfs.h"
+#endif
 #include "esp_vfs_common.h"
 
 #ifdef __cplusplus
