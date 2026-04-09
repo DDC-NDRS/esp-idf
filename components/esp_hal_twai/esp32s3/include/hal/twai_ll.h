@@ -733,19 +733,18 @@ static inline void twai_ll_format_frame_buffer(uint32_t id, uint8_t dlc, const u
     tx_frame->self_reception = (flags & TWAI_MSG_FLAG_SELF) ? 1 : 0;
     tx_frame->single_shot = (flags & TWAI_MSG_FLAG_SS) ? 1 : 0;
 
-    // Set ID. The ID registers are big endian and left aligned, therefore a bswap will be required
     if (is_extd) {
-        uint32_t id_temp = HAL_SWAP32((id & TWAI_EXTD_ID_MASK) << 3); // ((id << 3) >> 8*(3-i))
+        uint32_t id_temp = ((id & TWAI_EXTD_ID_MASK) << 3);
 
-        tx_frame->extended.id[0] = (id_temp >> (8 * 0)) & 0xFF;
-        tx_frame->extended.id[1] = (id_temp >> (8 * 1)) & 0xFF;
-        tx_frame->extended.id[2] = (id_temp >> (8 * 2)) & 0xFF;
-        tx_frame->extended.id[3] = (id_temp >> (8 * 3)) & 0xFF;
+        tx_frame->extended.id[0] = (id_temp >> 24) & 0xFF;
+        tx_frame->extended.id[1] = (id_temp >> 16) & 0xFF;
+        tx_frame->extended.id[2] = (id_temp >>  8) & 0xFF;
+        tx_frame->extended.id[3] = (id_temp >>  0) & 0xFF;
     } else {
-        uint32_t id_temp = HAL_SWAP16((id & TWAI_STD_ID_MASK) << 5); // ((id << 5) >> 8*(1-i))
+        uint32_t id_temp = ((id & TWAI_STD_ID_MASK) << 5);
 
-        tx_frame->standard.id[0] = (id_temp >> (8 * 0)) & 0xFF;
-        tx_frame->standard.id[1] = (id_temp >> (8 * 1)) & 0xFF;
+        tx_frame->standard.id[0] = (id_temp >> 8) & 0xFF;
+        tx_frame->standard.id[1] = (id_temp >> 0) & 0xFF;
     }
 
     uint8_t* data_buffer = (is_extd) ? tx_frame->extended.data : tx_frame->standard.data;
@@ -792,7 +791,6 @@ static inline void twai_ll_parse_frame_header(const twai_ll_frame_buffer_t *rx_f
     header->esi = 0;
     header->timestamp = 0;
 
-    // Copy ID. The ID registers are big endian and left aligned, therefore a bswap will be required
     if (rx_frame->frame_format) {
         uint32_t id_temp = (rx_frame->extended.id[0] << 24) |
                            (rx_frame->extended.id[1] << 16) |
