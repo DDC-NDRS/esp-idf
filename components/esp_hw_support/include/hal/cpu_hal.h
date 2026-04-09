@@ -13,7 +13,10 @@ Note: This is a compatibility header. Call the interfaces in esp_cpu.h instead
 #include <stdint.h>
 #include <stddef.h>
 #include "soc/soc_caps.h"
+
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 #include "hal/cpu_ll.h"
+#endif
 #include "esp_cpu.h"
 
 #ifdef __cplusplus
