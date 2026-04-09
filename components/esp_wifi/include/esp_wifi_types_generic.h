@@ -18,6 +18,12 @@ extern "C" {
 
 #define WIFI_AP_DEFAULT_MAX_IDLE_PERIOD  292 /**< Default timeout for SoftAP BSS Max Idle. Unit: 1000TUs >**/
 
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#define ZERO_LEN_ARRAY  1
+#else
+#define ZERO_LEN_ARRAY
+#endif
+
 /**
   * @brief Wi-Fi mode type
   */
@@ -685,7 +691,11 @@ typedef struct {
     uint8_t length;          /**< Length of all bytes in the element data following this field. Minimum 4. */
     uint8_t vendor_oui[3];   /**< Vendor identifier (OUI). */
     uint8_t vendor_oui_type; /**< Vendor-specific OUI type. */
+    #if !defined(_MSC_VER) /* #CUSTOM@NDRS */
     uint8_t payload[0];      /**< Payload. Length is equal to value in 'length' field, minus 4. */
+    #else
+    uint8_t payload[1];
+    #endif
 } vendor_ie_data_t;
 
 /**
@@ -804,7 +814,11 @@ typedef struct {
     uint8_t op_id;              /**< Unique Identifier for operation provided by wifi driver */
     uint8_t bssid[6];           /**< BSSID (A3) address. If all zeroes, broadcast address will be used */
     uint32_t data_len;          /**< Length of the appended Data */
+    #if !defined(_MSC_VER) /* #CUSTOM@NDRS */
     uint8_t data[0];            /**< Appended Data payload */
+    #else
+    uint8_t data[1];
+    #endif
 } wifi_action_tx_req_t;
 
 /** Status codes for WIFI_EVENT_ROC_DONE evt */
@@ -889,7 +903,7 @@ typedef enum {
 typedef struct {
     uint8_t wfa_oui[WIFI_OUI_LEN];  /**< WFA OUI - 0x50, 0x6F, 0x9A */
     uint8_t proto;                  /**< WFA defined protocol of type wifi_nan_svc_proto_t */
-    uint8_t payload[0];             /**< Service Info payload */
+    uint8_t payload[ZERO_LEN_ARRAY];/**< Service Info payload */
 } wifi_nan_wfa_ssi_t;
 
 /**
@@ -1397,7 +1411,7 @@ typedef struct {
     uint32_t reserved_2;        /**< Reserved */
     uint8_t ssi_version;        /**< Indicates version of SSI in Publish instance, 0 if not available */
     uint16_t ssi_len;           /**< Length of service specific info */
-    uint8_t ssi[];              /**< Service specific info of Publisher */
+    uint8_t ssi[ZERO_LEN_ARRAY];/**< Service specific info of Publisher */
 } wifi_event_nan_svc_match_t;
 
 /**
@@ -1410,7 +1424,7 @@ typedef struct {
     uint32_t reserved_1;        /**< Reserved */
     uint32_t reserved_2;        /**< Reserved */
     uint16_t ssi_len;           /**< Length of service specific info */
-    uint8_t ssi[];              /**< Service specific info of Subscriber */
+    uint8_t ssi[ZERO_LEN_ARRAY];/**< Service specific info of Subscriber */
 } wifi_event_nan_replied_t;
 
 /**
@@ -1423,7 +1437,7 @@ typedef struct {
     uint32_t reserved_1;                             /**< Reserved */
     uint32_t reserved_2;                             /**< Reserved */
     uint16_t ssi_len;                                /**< Length of service specific info */
-    uint8_t ssi[];                                   /**< Service specific info from Follow-up */
+    uint8_t ssi[ZERO_LEN_ARRAY];                     /**< Service specific info from Follow-up */
 } wifi_event_nan_receive_t;
 
 /**
@@ -1437,7 +1451,7 @@ typedef struct {
     uint32_t reserved_1;                        /**< Reserved */
     uint32_t reserved_2;                        /**< Reserved */
     uint16_t ssi_len;                           /**< Length of service specific info */
-    uint8_t ssi[];                              /**< Service specific info from NDP/NDPE Attribute */
+    uint8_t ssi[ZERO_LEN_ARRAY];                /**< Service specific info from NDP/NDPE Attribute */
 } wifi_event_ndp_indication_t;
 
 /**
@@ -1452,7 +1466,7 @@ typedef struct {
     uint32_t reserved_1;                        /**< Reserved */
     uint32_t reserved_2;                        /**< Reserved */
     uint16_t ssi_len;                           /**< Length of Service Specific Info */
-    uint8_t ssi[];                              /**< Service specific info from NDP/NDPE Attribute */
+    uint8_t ssi[ZERO_LEN_ARRAY];                /**< Service specific info from NDP/NDPE Attribute */
 } wifi_event_ndp_confirm_t;
 
 /**
@@ -1469,7 +1483,11 @@ typedef struct {
   */
 typedef struct {
     uint16_t report_len;                            /**< Length of the report*/
+    #if !defined(_MSC_VER) /* #CUSTOM@NDRS */
     uint8_t n_report[];                             /**< Neighbor Report received from the AP*/
+    #else
+    uint8_t n_report[1];
+    #endif
 } wifi_event_neighbor_report_t;
 
 /** Argument structure for WIFI_EVENT_AP_WRONG_PASSWORD event */
@@ -1548,7 +1566,7 @@ typedef struct {
 /** Argument structure for WIFI_EVENT_DPP_URI_READY event */
 typedef struct {
     uint32_t uri_data_len;       /**< URI data length including null termination */
-    char uri[];                  /**< URI data */
+    char uri[ZERO_LEN_ARRAY];    /**< URI data */
 } wifi_event_dpp_uri_ready_t;
 
 /** Argument structure for WIFI_EVENT_DPP_CFG_RECVD event */

@@ -67,7 +67,7 @@ typedef struct {
         .history_save_path = NULL,        \
         .task_stack_size = 4096,          \
         .task_priority = 2,               \
-        .task_core_id = tskNO_AFFINITY,   \
+        .task_core_id = (BaseType_t)tskNO_AFFINITY, \
         .prompt = NULL,                   \
         .max_cmdline_length = 0,          \
 }
@@ -125,7 +125,7 @@ typedef struct {
  *
  */
 typedef struct {
-
+    uint32_t dummy;
 } esp_console_dev_usb_serial_jtag_config_t;
 
 #define ESP_CONSOLE_DEV_USB_SERIAL_JTAG_CONFIG_DEFAULT() {}

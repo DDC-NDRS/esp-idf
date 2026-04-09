@@ -44,7 +44,11 @@ extern "C" {
 #endif
 
 #include <sys/types.h>
+#if !defined(_MSC_VER) /* #CUSTOM@NDRS */
 #include <unistd.h>
+#else
+typedef long ssize_t; /* #CUSTOM@NDRS */
+#endif
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
