@@ -44,7 +44,13 @@ extern "C" {
 #endif
 
 #include <sys/types.h>
+#if !defined(_MSC_VER) /* #CUSTOM@NDRS */
 #include <unistd.h>
+#elif !defined(_SSIZE_T_DEFINED)
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t; /* #CUSTOM@NDRS pointer-sized (64-bit on x64), unlike `long` on LLP64 */
+#define _SSIZE_T_DEFINED
+#endif
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

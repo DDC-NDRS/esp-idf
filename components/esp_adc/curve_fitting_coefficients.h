@@ -12,6 +12,13 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Upper bound of `cali_chars_second_step_t::term_num` over all targets (esp32c3/esp32s3 use 5, others 2-3)
+ *
+ * #CUSTOM@NDRS Used to size fixed arrays where VLAs are unavailable (non-GNU compilers).
+ */
+#define CURVE_FITTING_TERM_MAX  5
+
 typedef struct {
     uint8_t  term_num;                                        ///< Term number of the algorithm formula
     const uint64_t (*coeff)[2];    ///< Coeff of each term. See `adc_error_coef_atten` for details (and the magic number 2)

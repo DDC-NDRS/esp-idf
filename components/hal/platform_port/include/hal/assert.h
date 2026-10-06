@@ -6,6 +6,9 @@
 #pragma once
 
 #include "sdkconfig.h"
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#include <stdlib.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,8 +28,10 @@ extern "C" {
 #define __noreturn
 #endif
 
+#if defined(__GNUC__) /* #CUSTOM@NDRS */
 __noreturn void __assert_func(const char *file, int line, const char *func, const char *expr);
 __noreturn void abort(void);
+#endif
 
 #ifndef __ASSERT_FUNC
 #ifdef __ASSERT_FUNCTION
@@ -47,6 +52,12 @@ __noreturn void abort(void);
 
 #if IS_ULP_COCPU
 #define HAL_ASSERT(__e) ((void)(__e))
+#elif defined(_MSC_VER) /* #CUSTOM@NDRS no __builtin_expect/__builtin_unreachable/__assert_func: abort on failure */
+#if CONFIG_HAL_DEFAULT_ASSERTION_LEVEL >= 1
+#define HAL_ASSERT(__e) ((__e) ? (void)0 : abort())
+#else // no assert
+#define HAL_ASSERT(__e) ((void)(__e))
+#endif
 #elif CONFIG_HAL_DEFAULT_ASSERTION_LEVEL == 1 // silent
 #define HAL_ASSERT(__e) (__builtin_expect(!!(__e), 1) ? (void)0 : abort())
 #elif CONFIG_HAL_DEFAULT_ASSERTION_LEVEL == 2 // full assertion

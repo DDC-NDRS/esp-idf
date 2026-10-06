@@ -16,7 +16,7 @@ WEAK ESP_EVENT_DEFINE_BASE(WIFI_EVENT);
 struct wifi_osi_funcs_t { };
 #endif
 
-WEAK wifi_osi_funcs_t g_wifi_osi_funcs;
+WEAK wifi_osi_funcs_t const g_wifi_osi_funcs;
 WEAK const wpa_crypto_funcs_t g_wifi_default_wpa_crypto_funcs;
 WEAK uint64_t g_wifi_feature_caps =
 #if CONFIG_ESP_WIFI_ENABLE_WPA3_SAE

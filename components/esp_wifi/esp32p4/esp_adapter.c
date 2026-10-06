@@ -696,7 +696,7 @@ void * IRAM_ATTR esp_coex_common_malloc_internal_wrapper(size_t size)
     return heap_caps_malloc(size, MALLOC_CAP_8BIT | MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
 }
 
-wifi_osi_funcs_t g_wifi_osi_funcs = {
+wifi_osi_funcs_t const g_wifi_osi_funcs = {
     ._version = ESP_WIFI_OS_ADAPTER_VERSION,
     ._env_is_chip = esp_coex_common_env_is_chip_wrapper,
     ._set_intr = set_intr_wrapper,

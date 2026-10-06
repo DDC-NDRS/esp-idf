@@ -7,6 +7,9 @@
 #pragma once
 
 #include <stdint.h>
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#include "esp_compiler.h"
+#endif
 #include "esp_assert.h"
 #include "sdkconfig.h"
 

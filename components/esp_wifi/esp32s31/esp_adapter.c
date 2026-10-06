@@ -696,7 +696,7 @@ static int32_t esp_wifi_mac_sleep_retention_detach_wrapper(void)
 }
 #endif
 
-wifi_osi_funcs_t g_wifi_osi_funcs = {
+wifi_osi_funcs_t const g_wifi_osi_funcs = {
     ._version = ESP_WIFI_OS_ADAPTER_VERSION,
     ._env_is_chip = esp_coex_common_env_is_chip_wrapper,
     ._set_intr = set_intr_wrapper,

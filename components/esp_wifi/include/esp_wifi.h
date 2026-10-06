@@ -95,7 +95,7 @@ typedef struct wifi_osi_funcs_t wifi_osi_funcs_t;
  * @brief WiFi stack configuration parameters passed to esp_wifi_init call.
  */
 typedef struct {
-    wifi_osi_funcs_t*      osi_funcs;              /**< WiFi OS functions */
+    wifi_osi_funcs_t const* osi_funcs;             /**< WiFi OS functions */
     wpa_crypto_funcs_t     wpa_crypto_funcs;       /**< WiFi station crypto functions when connect */
     int                    static_rx_buf_num;      /**< WiFi static RX buffer number */
     int                    dynamic_rx_buf_num;     /**< WiFi dynamic RX buffer number */
@@ -187,7 +187,7 @@ typedef struct {
 #endif
 
 extern const wpa_crypto_funcs_t g_wifi_default_wpa_crypto_funcs;
-extern wifi_osi_funcs_t g_wifi_osi_funcs;
+extern wifi_osi_funcs_t const g_wifi_osi_funcs;
 
 #define WIFI_INIT_CONFIG_MAGIC    0x1F2F3F4F
 
@@ -1058,7 +1058,7 @@ esp_err_t esp_wifi_get_promiscuous_ctrl_filter(wifi_promiscuous_filter_t *filter
   *               the channel of the station.
   * @attention 4. The configuration will be stored in NVS for station and soft-AP
   *
-  * @param     interface  interface
+  * @param     iface  interface
   * @param     conf  station, soft-AP or NAN configuration
   *
   * @return
@@ -1072,12 +1072,12 @@ esp_err_t esp_wifi_get_promiscuous_ctrl_filter(wifi_promiscuous_filter_t *filter
   *    - ESP_ERR_WIFI_STATE: WiFi still connecting when invoke esp_wifi_set_config
   *    - others: refer to the error code in esp_err.h
   */
-esp_err_t esp_wifi_set_config(wifi_interface_t interface, wifi_config_t *conf);
+esp_err_t esp_wifi_set_config(wifi_interface_t iface, wifi_config_t *conf);
 
 /**
   * @brief     Get configuration of specified interface
   *
-  * @param     interface  interface
+  * @param     iface  interface
   * @param[out]  conf  station or soft-AP configuration
   *
   * @return
@@ -1086,7 +1086,7 @@ esp_err_t esp_wifi_set_config(wifi_interface_t interface, wifi_config_t *conf);
   *    - ESP_ERR_INVALID_ARG: invalid argument
   *    - ESP_ERR_WIFI_IF: invalid interface
   */
-esp_err_t esp_wifi_get_config(wifi_interface_t interface, wifi_config_t *conf);
+esp_err_t esp_wifi_get_config(wifi_interface_t iface, wifi_config_t *conf);
 
 /**
  * @brief Forward declare wifi_sta_list_t. The definition depends on the target device
@@ -1368,11 +1368,11 @@ esp_err_t esp_wifi_set_csi(bool en);
  *
  * @attention  Enabling power save may cause the return value inaccurate, except WiFi modem sleep
  *
- * @param      interface The interface whose tsf_time is to be retrieved.
+ * @param      iface The interface whose tsf_time is to be retrieved.
  *
  * @return     0 or the TSF time
  */
-int64_t esp_wifi_get_tsf_time(wifi_interface_t interface);
+int64_t esp_wifi_get_tsf_time(wifi_interface_t iface);
 
 /**
   * @brief     Set the inactive time of the STA or AP

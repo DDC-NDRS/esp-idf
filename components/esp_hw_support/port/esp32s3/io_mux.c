@@ -18,6 +18,7 @@
 extern portMUX_TYPE rtc_spinlock;
 DEFINE_CRIT_SECTION_LOCK_STATIC(s_io_mux_spinlock);
 
+
 static rtc_io_status_t s_rtc_io_status = {
     .rtc_io_enabled_cnt = { 0 },
     .rtc_io_using_mask = 0

@@ -20,10 +20,31 @@
 #include "esp_log_format.h"
 #include "esp_log_args.h"
 #include "esp_log_attr.h"
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#include <stdio.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+/* ESP_LOGx shim for MSVC (no esp_log backend on the host). Honors the compile-time log level when the host
+ * sdkconfig.h provides CONFIG_LOG_MAXIMUM_LEVEL, otherwise prints everything.
+ * `format` must be a string literal (as for the regular ESP_LOGx macros): the "[LEVEL] [tag] " prefix is
+ * concatenated at compile time, so there is no fixed-size buffer and no truncation. */
+#if defined(CONFIG_LOG_MAXIMUM_LEVEL)
+#define ESP_LOG_PRI_ENABLED(level)  ESP_LOG_ENABLED(level)
+#else
+#define ESP_LOG_PRI_ENABLED(level)  (1)
+#endif
+#define ESP_LOG_PRI(level, level_str, tag, format, ...)                                         \
+    do {                                                                                        \
+        if (ESP_LOG_PRI_ENABLED(level)) {                                                       \
+            printf("[%s] [%s] " format "\n", level_str, tag, ##__VA_ARGS__);                    \
+        }                                                                                       \
+    } while (0)
+#endif // defined(_MSC_VER)
 
 /**
  * @brief Logs a formatted message using the provided log message configs and a variable argument list.
@@ -74,11 +95,20 @@ void esp_log_va(esp_log_config_t config, const char *tag, const char *format, va
 #define ESP_LOGD(tag, format, ...) do { ESP_EARLY_LOGD(tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
 #define ESP_LOGV(tag, format, ...) do { ESP_EARLY_LOGV(tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
 #else
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#define ESP_LOGE(tag, format, ...) ESP_LOG_PRI(ESP_LOG_ERROR, "ERROR", tag, format, ##__VA_ARGS__)
+#define ESP_LOGW(tag, format, ...) ESP_LOG_PRI(ESP_LOG_WARN, "WARN", tag, format, ##__VA_ARGS__)
+#define ESP_LOGI(tag, format, ...) ESP_LOG_PRI(ESP_LOG_INFO, "INFO", tag, format, ##__VA_ARGS__)
+#define ESP_LOGD(tag, format, ...) ESP_LOG_PRI(ESP_LOG_DEBUG, "DEBUG", tag, format, ##__VA_ARGS__)
+#define ESP_LOGV(tag, format, ...) ESP_LOG_PRI(ESP_LOG_VERBOSE, "VERBOSE", tag, format, ##__VA_ARGS__)
+
+#else
 #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
 #define ESP_LOGW(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_WARN, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
 #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
 #define ESP_LOGD(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_DEBUG, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
 #define ESP_LOGV(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_VERBOSE, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+#endif
 #endif
 
 #define ESP_DRAM_LOGE(tag, format, ...) do { ESP_DRAM_LOG_IMPL(tag, format, ESP_LOG_ERROR, E __VA_OPT__(,) __VA_ARGS__); } while(0)
@@ -119,6 +149,14 @@ void esp_log_va(esp_log_config_t config, const char *tag, const char *format, va
 /// macro to output logs at ``ESP_LOG_VERBOSE`` level.
 #define ESP_LOGV(tag, format, ...) do { ESP_EARLY_LOGV(tag, format, ##__VA_ARGS__); } while(0)
 #else
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#define ESP_LOGE(tag, format, ...) ESP_LOG_PRI(ESP_LOG_ERROR, "ERROR", tag, format, ##__VA_ARGS__)
+#define ESP_LOGW(tag, format, ...) ESP_LOG_PRI(ESP_LOG_WARN, "WARN", tag, format, ##__VA_ARGS__)
+#define ESP_LOGI(tag, format, ...) ESP_LOG_PRI(ESP_LOG_INFO, "INFO", tag, format, ##__VA_ARGS__)
+#define ESP_LOGD(tag, format, ...) ESP_LOG_PRI(ESP_LOG_DEBUG, "DEBUG", tag, format, ##__VA_ARGS__)
+#define ESP_LOGV(tag, format, ...) ESP_LOG_PRI(ESP_LOG_VERBOSE, "VERBOSE", tag, format, ##__VA_ARGS__)
+
+#else
 /// macro to output logs at ``ESP_LOG_ERROR`` level.
 #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format, ##__VA_ARGS__); } while(0)
 /// macro to output logs at ``ESP_LOG_WARN`` level.
@@ -129,6 +167,7 @@ void esp_log_va(esp_log_config_t config, const char *tag, const char *format, va
 #define ESP_LOGD(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_DEBUG, tag, format, ##__VA_ARGS__); } while(0)
 /// macro to output logs at ``ESP_LOG_VERBOSE`` level.
 #define ESP_LOGV(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_VERBOSE, tag, format, ##__VA_ARGS__); } while(0)
+#endif
 #endif
 
 /**

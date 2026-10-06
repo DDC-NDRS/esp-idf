@@ -20,6 +20,10 @@ extern "C" {
 #define MAX_SSID_LEN        32    /**< Maximum length of SSID */
 #define MAX_PASSPHRASE_LEN  64    /**< Maximum length of passphrase */
 
+#if defined(_MSC_VER) /* #CUSTOM@NDRS */
+#pragma warning(disable : 4200) /* zero-sized/flexible array member: same layout as GNU [0] / [] */
+#endif
+
 /**
   * @brief Wi-Fi mode type
   */

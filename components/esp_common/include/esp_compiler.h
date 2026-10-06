@@ -8,6 +8,77 @@
 
 #include "sdkconfig.h"
 
+/* #CUSTOM@NDRS Shims for cl.exe only. clang-cl (also _MSC_VER) supports GNU attributes and builtins natively,
+ * so it must not get these definitions. NOTE: `__attribute__` is stripped for the rest of the translation unit,
+ * which silently drops `packed`/`aligned`: do not use cl.exe for layout-sensitive code. */
+#if defined(_MSC_VER) && !defined(__clang__)
+
+#include <intrin.h>
+#include <immintrin.h>
+#include <stdalign.h>
+#define __attribute__(...)
+#define likely(x)               (x)
+#define unlikely(x)             (x)
+#define __alignof__             alignof
+
+/* Same contract as the GCC builtins for x != 0. For x == 0 the operand width is returned (what lzcnt/tzcnt
+ * give), implemented with BSF/BSR so the result does not depend on the host CPU supporting BMI1/ABM. */
+static inline int __builtin_ctz(unsigned int x) {
+    unsigned long index;
+
+    return _BitScanForward(&index, x) ? (int)index : 32;
+}
+
+static inline int __builtin_clz(unsigned int x) {
+    unsigned long index;
+
+    return _BitScanReverse(&index, x) ? (31 - (int)index) : 32;
+}
+
+static inline int __builtin_ctzll(unsigned long long x) {
+    unsigned long index;
+
+#if defined(_M_X64) || defined(_M_ARM64)
+    return _BitScanForward64(&index, x) ? (int)index : 64;
+#else
+    if (_BitScanForward(&index, (unsigned long)x)) {
+        return (int)index;
+    }
+    if (_BitScanForward(&index, (unsigned long)(x >> 32))) {
+        return (int)index + 32;
+    }
+    return 64;
+#endif
+}
+
+static inline int __builtin_clzll(unsigned long long x) {
+    unsigned long index;
+
+#if defined(_M_X64) || defined(_M_ARM64)
+    return _BitScanReverse64(&index, x) ? (63 - (int)index) : 64;
+#else
+    if (_BitScanReverse(&index, (unsigned long)(x >> 32))) {
+        return 31 - (int)index;
+    }
+    if (_BitScanReverse(&index, (unsigned long)x)) {
+        return 63 - (int)index;
+    }
+    return 64;
+#endif
+}
+
+static inline int __builtin_ffs(int x) {
+    unsigned long index;
+
+    if (_BitScanForward(&index, x)) {
+        return index + 1; // Convert 0-based index to 1-based index
+    }
+
+    return 0; // If no bits are set, return 0
+}
+
+#endif
+
 /*
  * The likely and unlikely macro pairs:
  * These macros are useful to place when application

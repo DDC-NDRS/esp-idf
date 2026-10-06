@@ -961,6 +961,22 @@ esp_err_t twai_clear_transmit_queue_v2(twai_handle_t handle)
     return ESP_OK;
 }
 
+twai_state_t twai_get_state(void)
+{
+    // the handle-less driver API only support one TWAI controller, i.e. the g_twai_objs[0]
+    twai_handle_t handle = g_twai_objs[0];
+    if (handle == NULL) {
+        // driver not installed: nothing is running
+        return TWAI_STATE_STOPPED;
+    }
+
+    portENTER_CRITICAL(&handle->spinlock);
+    twai_state_t state = handle->state;
+    portEXIT_CRITICAL(&handle->spinlock);
+
+    return state;
+}
+
 esp_err_t twai_clear_transmit_queue(void)
 {
     // the handle-less driver API only support one TWAI controller, i.e. the g_twai_objs[0]
